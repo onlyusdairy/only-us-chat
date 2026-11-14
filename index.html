@@ -7,59 +7,65 @@
 <title>Only Us ❤️</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg:#10070d; --panel:#1d0d17; --panel2:#29101f;
-  --pink:#ff5c9a; --light:#ffd1e2; --muted:#b99aaa;
-  --border:#492238; --red:#a92e5e;
+:root{
+  --bg:#10070d;--panel:#1d0d17;--panel2:#291321;
+  --pink:#ff5c9a;--light:#ffd1e2;--muted:#b99aaa;
+  --border:#492238;
 }
 *{box-sizing:border-box}
 body{
-  margin:0;min-height:100vh;background:
-  radial-gradient(circle at 15% 10%,#42152d 0,transparent 32%),
-  radial-gradient(circle at 90% 90%,#351025 0,transparent 30%),var(--bg);
-  color:#fff;font-family:Arial,Helvetica,sans-serif;overflow-x:hidden
+  margin:0;min-height:100vh;color:white;font-family:Arial,sans-serif;
+  background:radial-gradient(circle at 15% 10%,#42152d,transparent 32%),
+  radial-gradient(circle at 90% 90%,#351025,transparent 30%),var(--bg);
+  overflow-x:hidden
 }
 button,input{font:inherit}
 button{cursor:pointer}
+.hidden{display:none!important}
 .heart{
-  position:fixed;bottom:-35px;color:#ff72a9;opacity:.35;
-  animation:floatUp 12s linear infinite;pointer-events:none;z-index:0;
-  text-shadow:0 0 12px #ff3f91,0 0 25px #ff3f91
+  position:fixed;bottom:-40px;color:#ff72a9;opacity:.35;
+  pointer-events:none;z-index:0;text-shadow:0 0 12px #ff3f91;
+  animation:floatUp 13s linear infinite
 }
 @keyframes floatUp{
   from{transform:translateY(0) rotate(0);opacity:0}
-  10%{opacity:.45}to{transform:translateY(-110vh) rotate(35deg);opacity:0}
+  10%{opacity:.4}
+  to{transform:translateY(-110vh) rotate(35deg);opacity:0}
 }
 #app{position:relative;z-index:1;min-height:100vh}
-.hidden{display:none!important}
 button.primary{
-  border:0;border-radius:12px;padding:12px 18px;color:white;font-weight:bold;
-  background:linear-gradient(135deg,#ff4f91,#b82e67);box-shadow:0 5px 20px #ff3f912c
+  border:0;border-radius:12px;padding:12px 17px;color:white;font-weight:bold;
+  background:linear-gradient(135deg,#ff4f91,#b82e67)
 }
 button.secondary{
-  border:1px solid var(--border);border-radius:10px;padding:10px 14px;
+  border:1px solid var(--border);border-radius:10px;padding:10px 13px;
   background:#301326;color:var(--light)
 }
-button.danger{background:#512033;color:#ffc5d7;border:1px solid #78304e}
 button:disabled{opacity:.5;cursor:not-allowed}
 input{
-  width:100%;padding:13px 14px;border-radius:11px;border:1px solid var(--border);
+  width:100%;padding:13px;border-radius:11px;border:1px solid var(--border);
   background:#120a10;color:white;outline:none;margin:7px 0
 }
 input:focus{border-color:var(--pink);box-shadow:0 0 0 3px #ff5c9a1c}
 small,.muted{color:var(--muted)}
 .auth-wrap{min-height:100vh;display:grid;place-items:center;padding:20px}
 .auth-card{
-  width:min(420px,100%);padding:30px;border:1px solid var(--border);
-  border-radius:22px;background:#1b0d17eF;box-shadow:0 20px 70px #0008
+  width:min(430px,100%);padding:28px;border:1px solid var(--border);
+  border-radius:22px;background:#1b0d17ed;box-shadow:0 20px 70px #0008
 }
-.logo{text-align:center;font-size:38px;font-weight:800;color:#ff8bb7;letter-spacing:2px}
-.logo span{display:block;font-size:13px;color:var(--muted);letter-spacing:4px;margin-top:7px}
+.logo{text-align:center;font-size:36px;font-weight:900;color:#ff8bb7;letter-spacing:2px}
+.logo span{display:block;font-size:12px;color:var(--muted);letter-spacing:4px;margin-top:7px}
 .auth-card h2{text-align:center;margin:25px 0 8px}
 .auth-card p{text-align:center;color:var(--muted);font-size:14px}
-.auth-card button{width:100%;margin-top:12px}
+.auth-card>div>button.primary{width:100%;margin-top:12px}
 .switch{text-align:center;margin-top:18px;color:var(--muted);font-size:14px}
 .switch a{color:#ff8bb7;cursor:pointer}
+.password-wrap{display:flex;align-items:center;gap:7px}
+.password-wrap input{flex:1;min-width:0}
+.eye-btn{
+  flex:0 0 46px;height:44px;margin:7px 0;border:1px solid var(--border);
+  border-radius:10px;background:#321629;color:#ffd1e2;font-size:19px
+}
 #main{max-width:1200px;margin:auto;padding:18px}
 .topbar{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -84,9 +90,12 @@ small,.muted{color:var(--muted)}
   border-radius:12px;background:#281321;margin:7px 0
 }
 .user-row .info,.friend-row .info,.request-row .info{flex:1;min-width:0}
-.user-row strong,.friend-row strong,.request-row strong{display:block;overflow:hidden;text-overflow:ellipsis}
-.user-row small,.friend-row small,.request-row small{font-size:12px}
+.user-row strong,.friend-row strong,.request-row strong{
+  display:block;overflow:hidden;text-overflow:ellipsis
+}
 .user-row button,.request-row button{padding:7px 9px;font-size:12px}
+.profile-box{padding:12px;background:#281321;border-radius:13px}
+.profile-box input{font-size:12px}
 .chat-panel{display:flex;flex-direction:column;min-height:570px}
 .chat-head{
   padding:15px 18px;border-bottom:1px solid var(--border);
@@ -117,8 +126,6 @@ small,.muted{color:var(--muted)}
   background:#321629;color:#ff9cbe;font-size:20px
 }
 #typing{font-size:12px;color:#ff9cbe;padding:0 18px 8px;min-height:18px}
-.profile-box{padding:12px;background:#281321;border-radius:13px}
-.profile-box input{font-size:12px}
 #toast{
   position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
   padding:12px 18px;background:#40172e;border:1px solid #a94470;
@@ -134,23 +141,32 @@ small,.muted{color:var(--muted)}
 </head>
 <body>
 <div id="app">
+
   <div class="auth-wrap" id="authScreen">
     <div class="auth-card">
       <div class="logo">♡ ONLY US <span>JUST YOU & ME</span></div>
+
       <div id="loginForm">
         <h2>Welcome back</h2>
         <p>Your private little space ❤️</p>
         <input id="loginEmail" type="email" placeholder="Email address" autocomplete="email">
-        <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password">
+        <div class="password-wrap">
+          <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password">
+          <button class="eye-btn" type="button" data-toggle="loginPassword" aria-label="Show password">👁️</button>
+        </div>
         <button class="primary" id="loginBtn">Login</button>
         <div class="switch">New here? <a id="showSignup">Create account</a></div>
       </div>
+
       <div id="signupForm" class="hidden">
         <h2>Create account</h2>
         <p>Start your private space together ❤️</p>
         <input id="signupName" placeholder="Your display name" maxlength="35">
         <input id="signupEmail" type="email" placeholder="Email address" autocomplete="email">
-        <input id="signupPassword" type="password" placeholder="Password (at least 8 characters)" autocomplete="new-password">
+        <div class="password-wrap">
+          <input id="signupPassword" type="password" placeholder="Password (at least 8 characters)" autocomplete="new-password">
+          <button class="eye-btn" type="button" data-toggle="signupPassword" aria-label="Show password">👁️</button>
+        </div>
         <button class="primary" id="signupBtn">Create account</button>
         <div class="switch">Already have an account? <a id="showLogin">Login</a></div>
       </div>
@@ -229,422 +245,432 @@ let presenceChannel = null;
 let typingChannel = null;
 let typingTimer = null;
 let typingHideTimer = null;
-let presenceUsers = new Set();
 let messageCache = new Set();
+let appChannels = [];
 
-function toast(message) {
-  const el = $("toast");
-  el.textContent = message;
-  el.style.display = "block";
+function toast(message){
+  const el=$("toast");
+  el.textContent=message;
+  el.style.display="block";
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => el.style.display = "none", 3500);
+  toast.timer=setTimeout(()=>el.style.display="none",3500);
 }
-function safeText(value) { return String(value ?? ""); }
-function escapeHTML(value) {
-  return safeText(value).replace(/[&<>"']/g, c => ({
+function escapeHTML(value){
+  return String(value??"").replace(/[&<>"']/g,c=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
-function initials(name) {
-  return safeText(name || "?").trim().slice(0,1).toUpperCase() || "?";
+function initials(name){
+  return String(name||"?").trim().slice(0,1).toUpperCase()||"?";
 }
-function timeText(date) {
-  return new Date(date).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+function timeText(date){
+  return new Date(date).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
 }
-function setAuthMode(mode) {
-  $("loginForm").classList.toggle("hidden", mode !== "login");
-  $("signupForm").classList.toggle("hidden", mode !== "signup");
+function setAuthMode(mode){
+  $("loginForm").classList.toggle("hidden",mode!=="login");
+  $("signupForm").classList.toggle("hidden",mode!=="signup");
 }
-function showMain() {
+function showMain(){
   $("authScreen").classList.add("hidden");
   $("main").classList.remove("hidden");
 }
-function showAuth() {
+function showAuth(){
   $("main").classList.add("hidden");
   $("authScreen").classList.remove("hidden");
 }
-function avatarFallback(name) {
-  return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+function avatarFallback(name){
+  return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100%" height="100%" fill="#51223a"/><text x="50%" y="56%" font-size="44" text-anchor="middle" fill="#ffd1e2" font-family="Arial">${initials(name)}</text></svg>`
   );
 }
-async function getAvatarUrl(path, name) {
-  if (!path) return avatarFallback(name);
-  const {data,error} = await db.storage.from("chat-photos").createSignedUrl(path, 3600);
-  return error ? avatarFallback(name) : data.signedUrl;
+
+/* Password show / hide */
+document.querySelectorAll("[data-toggle]").forEach(button=>{
+  button.addEventListener("click",()=>{
+    const input=$(button.dataset.toggle);
+    const showing=input.type==="password";
+    input.type=showing?"text":"password";
+    button.textContent=showing?"🙈":"👁️";
+    button.setAttribute("aria-label",showing?"Hide password":"Show password");
+  });
+});
+
+async function getAvatarUrl(path,name){
+  if(!path)return avatarFallback(name);
+  const {data,error}=await db.storage.from("chat-photos").createSignedUrl(path,3600);
+  return error?avatarFallback(name):data.signedUrl;
 }
-async function getPhotoUrl(path) {
-  if (!path) return null;
-  const {data,error} = await db.storage.from("chat-photos").createSignedUrl(path, 3600);
-  return error ? null : data.signedUrl;
+async function getPhotoUrl(path){
+  if(!path)return null;
+  const {data,error}=await db.storage.from("chat-photos").createSignedUrl(path,3600);
+  return error?null:data.signedUrl;
 }
 
-$("showSignup").onclick = () => setAuthMode("signup");
-$("showLogin").onclick = () => setAuthMode("login");
+$("showSignup").onclick=()=>setAuthMode("signup");
+$("showLogin").onclick=()=>setAuthMode("login");
 
-$("signupBtn").onclick = async () => {
-  const name = $("signupName").value.trim();
-  const email = $("signupEmail").value.trim();
-  const password = $("signupPassword").value;
-  if (!name || !email || password.length < 8) return toast("Name, email aur 8-character password enter karo.");
-  $("signupBtn").disabled = true;
-  const {data,error} = await db.auth.signUp({
+$("signupBtn").onclick=async()=>{
+  const name=$("signupName").value.trim();
+  const email=$("signupEmail").value.trim();
+  const password=$("signupPassword").value;
+  if(!name||!email||password.length<8)return toast("Name, email aur kam se kam 8-character password enter karo.");
+  $("signupBtn").disabled=true;
+  const {data,error}=await db.auth.signUp({
     email,password,options:{data:{display_name:name}}
   });
-  $("signupBtn").disabled = false;
-  if (error) return toast(error.message);
-  if (!data.session) {
+  $("signupBtn").disabled=false;
+  if(error)return toast(error.message);
+  if(!data.session){
     toast("Account created! Email inbox mein confirmation link check karo, phir login karo.");
-  } else {
+  }else{
     toast("Account created successfully!");
   }
 };
 
-$("loginBtn").onclick = async () => {
-  const email = $("loginEmail").value.trim();
-  const password = $("loginPassword").value;
-  if (!email || !password) return toast("Email aur password enter karo.");
-  $("loginBtn").disabled = true;
-  const {error} = await db.auth.signInWithPassword({email,password});
-  $("loginBtn").disabled = false;
-  if (error) toast(error.message);
+$("loginBtn").onclick=async()=>{
+  const email=$("loginEmail").value.trim();
+  const password=$("loginPassword").value;
+  if(!email||!password)return toast("Email aur password enter karo.");
+  $("loginBtn").disabled=true;
+  const {error}=await db.auth.signInWithPassword({email,password});
+  $("loginBtn").disabled=false;
+  if(error)toast(error.message);
 };
 
-$("logoutBtn").onclick = async () => {
-  await closeRealtime();
+$("logoutBtn").onclick=async()=>{
+  await closeChatRealtime();
+  for(const channel of appChannels)await db.removeChannel(channel);
+  appChannels=[];
   await db.auth.signOut();
-  currentUser = null; myProfile = null;
+  currentUser=null;myProfile=null;
   showAuth();
   toast("Logged out.");
 };
 
-async function loadProfile() {
-  const {data,error} = await db.from("profiles").select("*").eq("id",currentUser.id).single();
-  if (error) throw error;
-  myProfile = data;
-  $("myName").textContent = data.display_name || "User";
-  $("myUsername").textContent = data.username ? "@"+data.username : "Choose a username";
-  $("displayNameInput").value = data.display_name || "";
-  $("usernameInput").value = data.username || "";
-  $("myAvatar").src = await getAvatarUrl(data.avatar_url,data.display_name);
-  if (!data.username) toast("Apna unique username set karo.");
+async function loadProfile(){
+  const {data,error}=await db.from("profiles").select("*").eq("id",currentUser.id).single();
+  if(error)throw error;
+  myProfile=data;
+  $("myName").textContent=data.display_name||"User";
+  $("myUsername").textContent=data.username?"@"+data.username:"Choose a username";
+  $("displayNameInput").value=data.display_name||"";
+  $("usernameInput").value=data.username||"";
+  $("myAvatar").src=await getAvatarUrl(data.avatar_url,data.display_name);
+  if(!data.username)toast("Apna unique username set karo.");
 }
 
-$("saveProfileBtn").onclick = async () => {
-  const display_name = $("displayNameInput").value.trim();
-  const username = $("usernameInput").value.trim().toLowerCase();
-  if (!display_name || !username) return toast("Display name aur username dono enter karo.");
-  if (!/^[a-z0-9_]{3,20}$/.test(username)) return toast("Username 3–20 characters ka ho: letters, numbers, underscore.");
-  const {error} = await db.from("profiles").update({display_name,username}).eq("id",currentUser.id);
-  if (error) return toast(error.code === "23505" ? "Ye username already taken hai." : error.message);
+$("saveProfileBtn").onclick=async()=>{
+  const display_name=$("displayNameInput").value.trim();
+  const username=$("usernameInput").value.trim().toLowerCase();
+  if(!display_name||!username)return toast("Display name aur username dono enter karo.");
+  if(!/^[a-z0-9_]{3,20}$/.test(username))return toast("Username 3–20 characters ka ho: letters, numbers, underscore.");
+  const {error}=await db.from("profiles").update({display_name,username}).eq("id",currentUser.id);
+  if(error)return toast(error.code==="23505"?"Ye username already taken hai.":error.message);
   await loadProfile();
   toast("Profile updated ❤️");
 };
 
-async function uploadImage(file, folder) {
-  if (!file) return null;
-  const allowed = ["image/jpeg","image/png","image/webp","image/gif"];
-  if (!allowed.includes(file.type)) throw new Error("Only JPG, PNG, WEBP or GIF images are allowed.");
-  if (file.size > 5*1024*1024) throw new Error("Image 5 MB se chhoti honi chahiye.");
-  const ext = file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
-  const path = `${folder}/${currentUser.id}/${crypto.randomUUID()}.${ext}`;
-  const {error} = await db.storage.from("chat-photos").upload(path,file,{contentType:file.type,upsert:false});
-  if (error) throw error;
+async function uploadImage(file,folder){
+  if(!file)return null;
+  const allowed=["image/jpeg","image/png","image/webp","image/gif"];
+  if(!allowed.includes(file.type))throw new Error("Only JPG, PNG, WEBP or GIF images are allowed.");
+  if(file.size>5*1024*1024)throw new Error("Image 5 MB se chhoti honi chahiye.");
+  const ext=file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
+  const path=`${folder}/${currentUser.id}/${crypto.randomUUID()}.${ext}`;
+  const {error}=await db.storage.from("chat-photos").upload(path,file,{contentType:file.type,upsert:false});
+  if(error)throw error;
   return path;
 }
 
-$("avatarFile").onchange = async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  try {
-    const path = await uploadImage(file,"avatars");
-    const {error} = await db.from("profiles").update({avatar_url:path}).eq("id",currentUser.id);
-    if (error) throw error;
+$("avatarFile").onchange=async e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  try{
+    const path=await uploadImage(file,"avatars");
+    const {error}=await db.from("profiles").update({avatar_url:path}).eq("id",currentUser.id);
+    if(error)throw error;
     await loadProfile();
     toast("Profile photo updated!");
-  } catch(err) { toast(err.message); }
-  e.target.value = "";
+  }catch(err){toast(err.message);}
+  e.target.value="";
 };
 
-$("searchInput").oninput = async () => {
-  const term = $("searchInput").value.trim().toLowerCase();
-  if (term.length < 3) { $("searchResults").innerHTML = ""; return; }
-  const {data,error} = await db.from("profiles").select("id,username,display_name,avatar_url")
+$("searchInput").oninput=async()=>{
+  const term=$("searchInput").value.trim().toLowerCase();
+  if(term.length<3){$("searchResults").innerHTML="";return;}
+  const {data,error}=await db.from("profiles").select("id,username,display_name,avatar_url")
     .ilike("username",term).neq("id",currentUser.id).limit(10);
-  if (error) return toast(error.message);
-  $("searchResults").innerHTML = "";
-  for (const person of (data || [])) {
-    const existing = document.createElement("div");
-    existing.className = "user-row";
-    const img = document.createElement("img");
-    img.className = "avatar"; img.src = await getAvatarUrl(person.avatar_url,person.display_name);
-    const info = document.createElement("div"); info.className = "info";
-    info.innerHTML = `<strong>${escapeHTML(person.display_name)}</strong><small>@${escapeHTML(person.username || "")}</small>`;
-    const btn = document.createElement("button"); btn.className = "secondary"; btn.textContent = "Add";
-    btn.onclick = () => sendRequest(person.id,btn);
-    existing.append(img,info,btn);
-    $("searchResults").append(existing);
+  if(error)return toast(error.message);
+  $("searchResults").innerHTML="";
+  for(const person of data||[]){
+    const row=document.createElement("div");row.className="user-row";
+    const img=document.createElement("img");img.className="avatar";
+    img.src=await getAvatarUrl(person.avatar_url,person.display_name);
+    const info=document.createElement("div");info.className="info";
+    info.innerHTML=`<strong>${escapeHTML(person.display_name)}</strong><small>@${escapeHTML(person.username||"")}</small>`;
+    const btn=document.createElement("button");btn.className="secondary";btn.textContent="Add";
+    btn.onclick=()=>sendRequest(person.id,btn);
+    row.append(img,info,btn);$("searchResults").append(row);
   }
-  if (!data?.length) $("searchResults").innerHTML = "<small>No user found.</small>";
+  if(!data?.length)$("searchResults").innerHTML="<small>No user found.</small>";
 };
 
-async function sendRequest(receiverId,button) {
-  button.disabled = true;
-  const {data:existing,error:checkError} = await db.from("friend_requests")
-    .select("id,status").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${currentUser.id})`);
-  if (checkError) { button.disabled=false; return toast(checkError.message); }
-  if ((existing || []).some(r => r.status === "pending" || r.status === "accepted")) {
-    button.disabled=false; return toast("Request already exists or you are already connected.");
+async function sendRequest(receiverId,button){
+  button.disabled=true;
+  const {data:existing,error:checkError}=await db.from("friend_requests").select("id,status")
+    .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${currentUser.id})`);
+  if(checkError){button.disabled=false;return toast(checkError.message);}
+  if((existing||[]).some(r=>r.status==="pending"||r.status==="accepted")){
+    button.disabled=false;return toast("Request already exists or you are already connected.");
   }
-  const {error} = await db.from("friend_requests").insert({
+  const {error}=await db.from("friend_requests").insert({
     sender_id:currentUser.id,receiver_id:receiverId,status:"pending"
   });
-  button.disabled = false;
-  if (error) return toast(error.message);
+  button.disabled=false;
+  if(error)return toast(error.message);
   toast("Friend request sent ❤️");
-};
+}
 
-async function loadRequests() {
-  const {data,error} = await db.from("friend_requests").select("*")
+async function loadRequests(){
+  const {data,error}=await db.from("friend_requests").select("*")
     .eq("receiver_id",currentUser.id).eq("status","pending").order("created_at",{ascending:false});
-  if (error) return toast(error.message);
-  $("requestsList").innerHTML = "";
-  if (!data?.length) { $("requestsList").innerHTML = "<small>No pending requests.</small>"; return; }
-  for (const req of data) {
-    const {data:person} = await db.from("profiles").select("*").eq("id",req.sender_id).maybeSingle();
-    if (!person) continue;
-    const row = document.createElement("div"); row.className = "request-row";
-    const info = document.createElement("div"); info.className = "info";
-    info.innerHTML = `<strong>${escapeHTML(person.display_name)}</strong><small>@${escapeHTML(person.username || "")}</small>`;
-    const accept = document.createElement("button"); accept.className = "primary"; accept.textContent = "✓";
-    const reject = document.createElement("button"); reject.className = "secondary"; reject.textContent = "×";
-    accept.onclick = async () => {
-      accept.disabled = true;
-      const {data:conversationId,error} = await db.rpc("accept_friend_request",{p_request_id:req.id});
-      if (error) { accept.disabled=false; return toast(error.message); }
+  if(error)return toast(error.message);
+  $("requestsList").innerHTML="";
+  if(!data?.length){$("requestsList").innerHTML="<small>No pending requests.</small>";return;}
+  for(const req of data){
+    const {data:person}=await db.from("profiles").select("*").eq("id",req.sender_id).maybeSingle();
+    if(!person)continue;
+    const row=document.createElement("div");row.className="request-row";
+    const info=document.createElement("div");info.className="info";
+    info.innerHTML=`<strong>${escapeHTML(person.display_name)}</strong><small>@${escapeHTML(person.username||"")}</small>`;
+    const accept=document.createElement("button");accept.className="primary";accept.textContent="✓";
+    const reject=document.createElement("button");reject.className="secondary";reject.textContent="×";
+    accept.onclick=async()=>{
+      accept.disabled=true;
+      const {data:conversationId,error}=await db.rpc("accept_friend_request",{p_request_id:req.id});
+      if(error){accept.disabled=false;return toast(error.message);}
       toast("Friend request accepted!");
-      await loadRequests(); await loadFriends();
-      if (conversationId) await openChat(conversationId,person);
+      await loadRequests();await loadFriends();
+      if(conversationId)await openChat(conversationId,person);
     };
-    reject.onclick = async () => {
-      reject.disabled = true;
-      const {error} = await db.rpc("reject_friend_request",{p_request_id:req.id});
-      if (error) { reject.disabled=false; return toast(error.message); }
-      toast("Request rejected."); await loadRequests();
+    reject.onclick=async()=>{
+      reject.disabled=true;
+      const {error}=await db.rpc("reject_friend_request",{p_request_id:req.id});
+      if(error){reject.disabled=false;return toast(error.message);}
+      toast("Request rejected.");await loadRequests();
     };
-    row.append(info,accept,reject); $("requestsList").append(row);
+    row.append(info,accept,reject);$("requestsList").append(row);
   }
 }
 
-async function loadFriends() {
-  const {data:members,error} = await db.from("conversation_members")
-    .select("conversation_id,user_id").eq("user_id",currentUser.id);
-  if (error) return toast(error.message);
-  $("friendsList").innerHTML = "";
-  if (!members?.length) { $("friendsList").innerHTML = "<small>No chats yet.</small>"; return; }
-  const seen = new Set();
-  for (const m of members) {
-    if (seen.has(m.conversation_id)) continue;
+async function loadFriends(){
+  const {data:members,error}=await db.from("conversation_members").select("conversation_id,user_id")
+    .eq("user_id",currentUser.id);
+  if(error)return toast(error.message);
+  $("friendsList").innerHTML="";
+  if(!members?.length){$("friendsList").innerHTML="<small>No chats yet.</small>";return;}
+  const seen=new Set();
+  for(const m of members){
+    if(seen.has(m.conversation_id))continue;
     seen.add(m.conversation_id);
-    const {data:others} = await db.from("conversation_members")
-      .select("user_id").eq("conversation_id",m.conversation_id).neq("user_id",currentUser.id);
-    const otherId = others?.[0]?.user_id;
-    if (!otherId) continue;
-    const {data:person} = await db.from("profiles").select("*").eq("id",otherId).maybeSingle();
-    if (!person) continue;
-    const row = document.createElement("div"); row.className = "friend-row";
-    const img = document.createElement("img"); img.className = "avatar";
-    img.src = await getAvatarUrl(person.avatar_url,person.display_name);
-    const info = document.createElement("div"); info.className = "info";
-    info.innerHTML = `<strong>${escapeHTML(person.display_name)}</strong><small>@${escapeHTML(person.username || "")}</small>`;
-    row.append(img,info);
-    row.onclick = () => openChat(m.conversation_id,person);
-    row.style.cursor = "pointer";
+    const {data:others}=await db.from("conversation_members").select("user_id")
+      .eq("conversation_id",m.conversation_id).neq("user_id",currentUser.id);
+    const otherId=others?.[0]?.user_id;
+    if(!otherId)continue;
+    const {data:person}=await db.from("profiles").select("*").eq("id",otherId).maybeSingle();
+    if(!person)continue;
+    const row=document.createElement("div");row.className="friend-row";
+    const img=document.createElement("img");img.className="avatar";
+    img.src=await getAvatarUrl(person.avatar_url,person.display_name);
+    const info=document.createElement("div");info.className="info";
+    info.innerHTML=`<strong>${escapeHTML(person.display_name)}</strong><small>@${escapeHTML(person.username||"")}</small>`;
+    row.append(img,info);row.style.cursor="pointer";
+    row.onclick=()=>openChat(m.conversation_id,person);
     $("friendsList").append(row);
   }
 }
 
-async function closeRealtime() {
-  for (const channel of [messageChannel,presenceChannel,typingChannel]) {
-    if (channel) await db.removeChannel(channel);
+async function closeChatRealtime(){
+  for(const channel of [messageChannel,presenceChannel,typingChannel]){
+    if(channel)await db.removeChannel(channel);
   }
-  messageChannel = presenceChannel = typingChannel = null;
-  activeConversation = null; activeFriend = null;
+  messageChannel=null;presenceChannel=null;typingChannel=null;
+  activeConversation=null;activeFriend=null;
 }
 
-async function openChat(conversationId,person) {
-  await closeRealtime();
-  activeConversation = conversationId; activeFriend = person;
-  messageCache = new Set();
-  $("chatTitle").textContent = person.display_name || person.username;
-  $("chatStatus").textContent = "Connecting...";
+async function openChat(conversationId,person){
+  await closeChatRealtime();
+  activeConversation=conversationId;activeFriend=person;
+  messageCache=new Set();
+  $("chatTitle").textContent=person.display_name||person.username;
+  $("chatStatus").textContent="Connecting...";
   $("chatAvatar").classList.remove("hidden");
-  $("chatAvatar").src = await getAvatarUrl(person.avatar_url,person.display_name);
-  $("messages").innerHTML = "";
-  $("messageInput").disabled = false; $("sendBtn").disabled = false;
+  $("chatAvatar").src=await getAvatarUrl(person.avatar_url,person.display_name);
+  $("messages").innerHTML="";
+  $("messageInput").disabled=false;$("sendBtn").disabled=false;
   await loadMessages();
   await setupChatRealtime(conversationId);
 }
 
-function addMessage(message,photoUrl) {
-  if (messageCache.has(message.id)) return;
+function addMessage(message,photoUrl){
+  if(messageCache.has(message.id))return;
   messageCache.add(message.id);
-  const empty = $("messages").querySelector(".empty");
-  if (empty) empty.remove();
-  const bubble = document.createElement("div");
-  bubble.className = "bubble" + (message.sender_id === currentUser.id ? " mine" : "");
-  if (photoUrl) {
-    const img = document.createElement("img"); img.src = photoUrl; img.alt = "Shared photo";
+  const empty=$("messages").querySelector(".empty");
+  if(empty)empty.remove();
+  const bubble=document.createElement("div");
+  bubble.className="bubble"+(message.sender_id===currentUser.id?" mine":"");
+  if(photoUrl){
+    const img=document.createElement("img");img.src=photoUrl;img.alt="Shared photo";
     bubble.append(img);
   }
-  if (message.content) {
-    const text = document.createElement("div"); text.textContent = message.content;
+  if(message.content){
+    const text=document.createElement("div");text.textContent=message.content;
     bubble.append(text);
   }
-  const meta = document.createElement("span"); meta.className = "time";
-  meta.textContent = timeText(message.created_at) + (message.sender_id === currentUser.id ? (message.seen_at ? " · Seen" : " · Sent") : "");
-  bubble.append(meta);
-  $("messages").append(bubble);
-  $("messages").scrollTop = $("messages").scrollHeight;
+  const meta=document.createElement("span");meta.className="time";
+  meta.textContent=timeText(message.created_at)+
+    (message.sender_id===currentUser.id?(message.seen_at?" · Seen":" · Sent"):"");
+  bubble.append(meta);$("messages").append(bubble);
+  $("messages").scrollTop=$("messages").scrollHeight;
 }
 
-async function loadMessages() {
-  const {data,error} = await db.from("messages").select("*")
-    .eq("conversation_id",activeConversation).order("created_at",{ascending:true}).limit(150);
-  if (error) return toast(error.message);
-  for (const msg of (data || [])) {
-    const photo = msg.image_url ? await getPhotoUrl(msg.image_url) : null;
+async function loadMessages(){
+  const conversationId=activeConversation;
+  const {data,error}=await db.from("messages").select("*")
+    .eq("conversation_id",conversationId).order("created_at",{ascending:true}).limit(150);
+  if(error)return toast(error.message);
+  if(conversationId!==activeConversation)return;
+  $("messages").innerHTML="";
+  messageCache=new Set();
+  for(const msg of data||[]){
+    const photo=msg.image_url?await getPhotoUrl(msg.image_url):null;
     addMessage(msg,photo);
   }
-  const unseen = (data || []).filter(m => m.sender_id !== currentUser.id && !m.seen_at).map(m => m.id);
-  if (unseen.length) {
-    const {error:seenError} = await db.from("messages").update({seen_at:new Date().toISOString()})
-      .in("id",unseen);
-    if (seenError) console.warn("Seen update:",seenError.message);
+  if(!data?.length)$("messages").innerHTML='<div class="empty">Say hello ❤️</div>';
+  const unseen=(data||[]).filter(m=>m.sender_id!==currentUser.id&&!m.seen_at).map(m=>m.id);
+  if(unseen.length){
+    const {error:seenError}=await db.from("messages").update({seen_at:new Date().toISOString()}).in("id",unseen);
+    if(seenError)console.warn("Seen update:",seenError.message);
   }
-  if (!data?.length) $("messages").innerHTML = '<div class="empty">Say hello ❤️</div>';
 }
 
-async function setupChatRealtime(conversationId) {
-  messageChannel = db.channel("messages-"+conversationId)
-    .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:`conversation_id=eq.${conversationId}`},async payload => {
-      const msg = payload.new;
-      const photo = msg.image_url ? await getPhotoUrl(msg.image_url) : null;
+async function setupChatRealtime(conversationId){
+  messageChannel=db.channel("messages-"+conversationId)
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:`conversation_id=eq.${conversationId}`},async payload=>{
+      if(conversationId!==activeConversation)return;
+      const msg=payload.new;
+      const photo=msg.image_url?await getPhotoUrl(msg.image_url):null;
       addMessage(msg,photo);
-      if (msg.sender_id !== currentUser.id && !msg.seen_at) {
+      if(msg.sender_id!==currentUser.id&&!msg.seen_at){
         await db.from("messages").update({seen_at:new Date().toISOString()}).eq("id",msg.id);
       }
     })
-    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"messages",filter:`conversation_id=eq.${conversationId}`},payload => {
-      const msg = payload.new;
-      if (msg.seen_at && msg.sender_id === currentUser.id) {
-        // Refresh message list so the sent status changes to Seen.
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"messages",filter:`conversation_id=eq.${conversationId}`},payload=>{
+      if(conversationId===activeConversation&&payload.new.sender_id===currentUser.id&&payload.new.seen_at){
         loadMessages();
       }
     }).subscribe();
 
-  presenceChannel = db.channel("presence-"+conversationId,{config:{presence:{key:currentUser.id}}});
-  presenceChannel.on("presence",{event:"sync"},() => {
-    const state = presenceChannel.presenceState();
-    presenceUsers = new Set(Object.keys(state));
-    $("chatStatus").textContent = presenceUsers.has(activeFriend.id) ? "Online" : "Offline";
+  presenceChannel=db.channel("presence-"+conversationId,{config:{presence:{key:currentUser.id}}});
+  presenceChannel.on("presence",{event:"sync"},()=>{
+    const state=presenceChannel.presenceState();
+    const online=Object.keys(state).includes(activeFriend.id);
+    $("chatStatus").textContent=online?"Online":"Offline";
   });
-  await presenceChannel.subscribe(async status => {
-    if (status === "SUBSCRIBED") {
-      await presenceChannel.track({online_at:new Date().toISOString()});
-    }
+  await presenceChannel.subscribe(async status=>{
+    if(status==="SUBSCRIBED")await presenceChannel.track({online_at:new Date().toISOString()});
   });
 
-  typingChannel = db.channel("typing-"+conversationId);
-  typingChannel.on("broadcast",{event:"typing"},payload => {
-    if (payload.payload?.userId !== currentUser.id) {
-      $("typing").textContent = payload.payload?.typing ? `${activeFriend.display_name} is typing...` : "";
+  typingChannel=db.channel("typing-"+conversationId);
+  typingChannel.on("broadcast",{event:"typing"},payload=>{
+    if(payload.payload?.userId!==currentUser.id){
+      $("typing").textContent=payload.payload?.typing?`${activeFriend.display_name} is typing...`:"";
       clearTimeout(typingHideTimer);
-      if (payload.payload?.typing) typingHideTimer = setTimeout(()=>$("typing").textContent="",2500);
+      if(payload.payload?.typing)typingHideTimer=setTimeout(()=>$("typing").textContent="",2500);
     }
   }).subscribe();
 }
 
-async function sendMessage(content,imagePath=null) {
-  if (!activeConversation) return toast("Pehle chat select karo.");
-  if (!content && !imagePath) return;
-  $("sendBtn").disabled = true;
-  const {error} = await db.from("messages").insert({
+async function sendMessage(content,imagePath=null){
+  if(!activeConversation)return toast("Pehle chat select karo.");
+  if(!content&&!imagePath)return;
+  $("sendBtn").disabled=true;
+  const {error}=await db.from("messages").insert({
     conversation_id:activeConversation,sender_id:currentUser.id,
-    content:content || null,image_url:imagePath
+    content:content||null,image_url:imagePath
   });
-  $("sendBtn").disabled = false;
-  if (error) return toast(error.message);
-  $("messageInput").value = "";
-  if (typingChannel) typingChannel.send({type:"broadcast",event:"typing",payload:{userId:currentUser.id,typing:false}});
+  $("sendBtn").disabled=false;
+  if(error)return toast(error.message);
+  $("messageInput").value="";
+  if(typingChannel)typingChannel.send({
+    type:"broadcast",event:"typing",payload:{userId:currentUser.id,typing:false}
+  });
 }
 
-$("sendBtn").onclick = () => sendMessage($("messageInput").value.trim());
-$("messageInput").addEventListener("keydown",e => {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("sendBtn").click(); }
+$("sendBtn").onclick=()=>sendMessage($("messageInput").value.trim());
+$("messageInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("sendBtn").click();}
 });
-$("messageInput").addEventListener("input",() => {
-  if (!typingChannel) return;
+$("messageInput").addEventListener("input",()=>{
+  if(!typingChannel)return;
   typingChannel.send({type:"broadcast",event:"typing",payload:{userId:currentUser.id,typing:true}});
   clearTimeout(typingTimer);
-  typingTimer = setTimeout(() => {
-    if (typingChannel) typingChannel.send({type:"broadcast",event:"typing",payload:{userId:currentUser.id,typing:false}});
+  typingTimer=setTimeout(()=>{
+    if(typingChannel)typingChannel.send({
+      type:"broadcast",event:"typing",payload:{userId:currentUser.id,typing:false}
+    });
   },1200);
 });
 
-$("photoFile").onchange = async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  if (!activeConversation) { e.target.value=""; return toast("Pehle chat select karo."); }
-  try {
-    const path = await uploadImage(file,activeConversation);
+$("photoFile").onchange=async e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  if(!activeConversation){e.target.value="";return toast("Pehle chat select karo.");}
+  try{
+    const path=await uploadImage(file,activeConversation);
     await sendMessage("",path);
-  } catch(err) { toast(err.message); }
-  e.target.value = "";
+  }catch(err){toast(err.message);}
+  e.target.value="";
 };
 
-async function startApp(user) {
-  currentUser = user;
+async function startApp(user){
+  currentUser=user;
   showMain();
-  try {
+  try{
     await loadProfile();
     await Promise.all([loadRequests(),loadFriends()]);
-    const requestsChannel = db.channel("requests-"+user.id)
-      .on("postgres_changes",{event:"*",schema:"public",table:"friend_requests"},() => {
-        loadRequests(); loadFriends();
+    const requestsChannel=db.channel("requests-"+user.id)
+      .on("postgres_changes",{event:"*",schema:"public",table:"friend_requests"},()=>{
+        loadRequests();loadFriends();
       }).subscribe();
-    const profileChannel = db.channel("profiles-"+user.id)
-      .on("postgres_changes",{event:"UPDATE",schema:"public",table:"profiles"},() => loadFriends())
-      .subscribe();
-  } catch(err) {
-    toast("Profile load error: "+err.message);
-  }
+    appChannels.push(requestsChannel);
+  }catch(err){toast("Profile load error: "+err.message);}
 }
 
-db.auth.onAuthStateChange((event,session) => {
-  if (session?.user) {
-    currentUser = session.user;
-    setTimeout(() => startApp(session.user),0);
-  } else {
-    currentUser = null;
+db.auth.onAuthStateChange((event,session)=>{
+  if(session?.user){
+    currentUser=session.user;
+    setTimeout(()=>startApp(session.user),0);
+  }else{
+    currentUser=null;
     showAuth();
   }
 });
 
-(async () => {
-  const {data:{session}} = await db.auth.getSession();
-  if (session?.user) await startApp(session.user);
+(async()=>{
+  const {data:{session}}=await db.auth.getSession();
+  if(session?.user)await startApp(session.user);
   else showAuth();
 })();
 
-for (let i=0;i<13;i++) {
-  const heart = document.createElement("div");
-  heart.className = "heart";
-  heart.textContent = ["♡","♥","💕"][i%3];
-  heart.style.left = (Math.random()*100)+"%";
-  heart.style.animationDelay = (Math.random()*12)+"s";
-  heart.style.animationDuration = (9+Math.random()*9)+"s";
-  heart.style.fontSize = (14+Math.random()*22)+"px";
+for(let i=0;i<13;i++){
+  const heart=document.createElement("div");
+  heart.className="heart";
+  heart.textContent=["♡","♥","💕"][i%3];
+  heart.style.left=(Math.random()*100)+"%";
+  heart.style.animationDelay=(Math.random()*12)+"s";
+  heart.style.animationDuration=(9+Math.random()*9)+"s";
+  heart.style.fontSize=(14+Math.random()*22)+"px";
   document.body.appendChild(heart);
 }
 </script>
