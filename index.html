@@ -632,17 +632,52 @@ function subscribePresence(){
 
 $("editProfileBtn").onclick=()=>{
  $("modalTitle").textContent="Edit profile";
- $("modalBody").innerHTML=`
-  <label>Display name</label><input id="editDisplayName" maxlength="35" value="${escapeHTML(myProfile.display_name||"")}">
-  <label>Username</label><input id="editUsername" maxlength="20" value="${escapeHTML(myProfile.username||"")}">
- `;
+ $("modalBody").innerHTML=\`
+  <label>Display name</label><input id="editDisplayName" maxlength="35" value="\${escapeHTML(myProfile.display_name||"")}">
+  <label>Username</label><input id="editUsername" maxlength="20" value="\${escapeHTML(myProfile.username||"")}">
+  <label>Current email</label><input value="\${escapeHTML(currentUser.email||"")}" disabled>
+  <label>New email (optional)</label><input id="editEmail" type="email" maxlength="254" placeholder="Enter new email address">
+  <label>Current password (required for email/password changes)</label><input id="currentPassword" type="password" autocomplete="current-password" placeholder="Enter current password">
+  <label>New password (optional)</label><input id="newPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters">
+  <label>Confirm new password</label><input id="confirmNewPassword" type="password" autocomplete="new-password" placeholder="Re-enter new password">
+  <small class="muted">Email changes may still require confirmation from your email inbox, depending on Supabase settings.</small>
+ \`;
  openModal(async()=>{
   const display_name=$("editDisplayName").value.trim();
   const username=$("editUsername").value.trim().toLowerCase();
+  const newEmail=$("editEmail").value.trim().toLowerCase();
+  const currentPassword=$("currentPassword").value;
+  const newPassword=$("newPassword").value;
+  const confirmPassword=$("confirmNewPassword").value;
   if(!display_name||!validUsername(username))throw new Error("Display name aur valid username enter karo.");
-  const {error}=await db.from("profiles").update({display_name,username}).eq("id",currentUser.id);
-  if(error)throw error;
-  await loadMyProfile();toast("Profile updated ❤️");
+  if(newEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail))throw new Error("Valid email address enter karo.");
+  if(newPassword && newPassword.length<8)throw new Error("New password kam se kam 8 characters ka hona chahiye.");
+  if(newPassword!==confirmPassword)throw new Error("New password aur confirmation match nahi karte.");
+  const emailChanged=newEmail && newEmail!==String(currentUser.email||"").toLowerCase();
+  const passwordChanged=!!newPassword;
+  if((emailChanged||passwordChanged)&&!currentPassword)throw new Error("Email ya password change karne ke liye current password enter karo.");
+  if(emailChanged||passwordChanged){
+   const {error:verifyError}=await db.auth.signInWithPassword({email:currentUser.email,password:currentPassword});
+   if(verifyError)throw new Error("Current password galat hai.");
+  }
+  const {error:profileError}=await db.from("profiles").update({display_name,username}).eq("id",currentUser.id);
+  if(profileError)throw profileError;
+  await loadMyProfile();
+  if(emailChanged){
+   const {error:emailError}=await db.auth.updateUser(
+    {email:newEmail},
+    {emailRedirectTo:window.location.origin+window.location.pathname}
+   );
+   if(emailError)throw emailError;
+  }
+  if(passwordChanged){
+   const {error:passwordError}=await db.auth.updateUser({password:newPassword});
+   if(passwordError)throw passwordError;
+  }
+  if(emailChanged&&passwordChanged)toast("Profile aur password updated. Email confirmation inbox mein check karo.");
+  else if(emailChanged)toast("Profile updated. Email change ke liye confirmation link check karo.");
+  else if(passwordChanged)toast("Profile aur password updated ❤️");
+  else toast("Profile updated ❤️");
  });
 };
 function openModal(action){
