@@ -1,21 +1,286 @@
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#160b13">
+<title>Only Us — Private Chat</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+ --bg:#100910;--panel:#1b111b;--panel2:#241725;
+ --border:#39263a;--pink:#e879a8;--text:#f8edf4;
+ --muted:#ad96a8;--danger:#ff6b79;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:Arial,sans-serif;min-height:100vh;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+button:disabled{opacity:.5;cursor:not-allowed}
+#authView{
+ min-height:100vh;display:grid;place-items:center;padding:20px;
+ background:radial-gradient(circle at top,#42213a,#100910 65%);
+}
+.auth-card{
+ width:min(420px,100%);padding:30px;border:1px solid var(--border);
+ border-radius:22px;background:#1b111bf2;box-shadow:0 20px 70px #0008;
+}
+.logo{font-size:34px;font-weight:800;text-align:center;color:var(--pink)}
+.sub{text-align:center;color:var(--muted);margin:8px 0 26px}
+.field{
+ width:100%;padding:14px;margin:8px 0;background:#100910;
+ border:1px solid var(--border);border-radius:12px;color:white;outline:none;
+}
+.field:focus{border-color:var(--pink)}
+.primary{
+ border:0;border-radius:12px;padding:13px 18px;
+ background:var(--pink);color:#210d19;font-weight:800;
+}
+.auth-card .primary{width:100%;margin-top:12px}
+.linkbtn{background:none;border:0;color:var(--pink);padding:12px}
+.muted{color:var(--muted);font-size:13px}
+#app{
+ height:100dvh;max-width:1200px;margin:auto;
+ display:grid;grid-template-columns:340px 1fr;
+ background:var(--panel);overflow:hidden;
+ border-left:1px solid var(--border);border-right:1px solid var(--border);
+}
+.sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;min-width:0}
+.side-head{
+ padding:18px;display:flex;align-items:center;justify-content:space-between;
+ border-bottom:1px solid var(--border);
+}
+.side-head strong{font-size:23px;color:var(--pink)}
+.profile-mini{display:flex;align-items:center;gap:10px;padding:15px;border-bottom:1px solid var(--border)}
+.avatar{
+ width:43px;height:43px;border-radius:50%;object-fit:cover;
+ background:#71304f;display:grid;place-items:center;flex-shrink:0;
+ color:white;font-weight:bold;
+}
+.profile-mini .avatar{width:48px;height:48px}
+.person{
+ display:flex;align-items:center;gap:11px;padding:12px;
+ border-bottom:1px solid #39263a55;cursor:pointer;min-width:0;
+}
+.person:hover{background:#ffffff09}
+.person-info{flex:1;min-width:0}
+.person-info b,.person-info small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.person-info small{color:var(--muted);margin-top:5px;font-size:12px}
+.section-label{padding:14px 14px 5px;color:var(--pink);font-size:12px;font-weight:bold;text-transform:uppercase}
+#peopleList,#requestsList{overflow:auto}
+.icon-btn,.friend-remove-btn{
+ background:var(--panel2);border:1px solid var(--border);
+ color:var(--text);padding:8px 11px;border-radius:10px;
+}
+.friend-remove-btn{color:var(--danger);font-size:18px}
+.search-wrap{padding:12px}
+.search-wrap .field{margin:0}
+.side-actions{display:flex;gap:8px;flex-wrap:wrap;padding:12px}
+.side-actions button{flex:1}
+#chatArea{display:flex;flex-direction:column;min-width:0;min-height:0}
+.chat-head{
+ display:flex;align-items:center;gap:12px;padding:13px 16px;
+ border-bottom:1px solid var(--border);min-height:72px;
+}
+.chat-head .person-info{flex:1}
+.chat-head .avatar{width:42px;height:42px}
+#messages{
+ flex:1;overflow-y:auto;padding:20px;
+ display:flex;flex-direction:column;gap:12px;
+}
+.message{max-width:min(75%,520px);align-self:flex-start}
+.message.mine{align-self:flex-end}
+.bubble{
+ background:var(--panel2);padding:11px 14px;border-radius:16px;
+ overflow-wrap:anywhere;line-height:1.45;
+}
+.message.mine .bubble{background:#71304f}
+.bubble img{display:block;max-width:100%;max-height:320px;border-radius:10px;margin-bottom:5px}
+.bubble.deleted{color:var(--muted);font-style:italic}
+.msg-foot{display:flex;gap:10px;align-items:center;justify-content:flex-end;color:var(--muted);font-size:10px;padding:4px 4px 0}
+.msg-menu{border:0;background:none;color:var(--muted);font-size:17px}
+.emoji-message{font-size:34px}
+.reaction-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.reaction-chip{border:1px solid var(--border);background:#241725;color:white;border-radius:20px;padding:4px 8px}
+.reaction-chip.mine{border-color:var(--pink)}
+.compose{
+ display:flex;align-items:center;gap:8px;padding:12px;
+ border-top:1px solid var(--border);
+}
+.compose .field{margin:0;flex:1;min-width:0}
+.attach{background:var(--panel2);border:1px solid var(--border);color:white;padding:12px;border-radius:12px}
+.send-btn{padding:13px 17px}
+#emptyState{margin:auto;text-align:center;color:var(--muted);padding:30px}
+#typingStatus{font-size:12px;color:var(--pink);padding:0 18px}
+#toast{
+ position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+ background:#392039;color:white;padding:12px 18px;border-radius:12px;
+ box-shadow:0 8px 30px #0008;z-index:1000;max-width:90vw;
+}
+#modalBg{
+ position:fixed;inset:0;background:#000a;z-index:500;
+ display:grid;place-items:center;padding:18px;
+}
+.modal{
+ width:min(430px,100%);max-height:85vh;overflow:auto;
+ padding:22px;border-radius:18px;background:var(--panel);
+ border:1px solid var(--border);
+}
+.modal h3{margin-top:0}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.message-menu-pop,.friend-menu-pop{
+ position:fixed;z-index:800;background:#281a2a;
+ border:1px solid var(--border);border-radius:14px;
+ padding:8px;box-shadow:0 10px 35px #0009;min-width:190px;
+}
+.reaction-picker{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
+.reaction-picker button{border:0;background:none;font-size:21px;padding:5px}
+.menu-action{
+ display:block;width:100%;text-align:left;background:none;border:0;
+ color:white;padding:11px;border-radius:8px;
+}
+.menu-action:hover{background:#ffffff12}
+.menu-action.delete{color:var(--danger)}
+.password-wrap{position:relative}
+.password-wrap .field{padding-right:65px}
+.password-toggle{
+ position:absolute;right:9px;top:18px;border:0;background:none;
+ color:var(--pink);font-size:12px;
+}
+.hint{color:var(--muted);font-size:13px;padding:10px}
+@media(max-width:700px){
+ #app{display:block;width:100%;height:100dvh}
+ .sidebar{height:100%;width:100%}
+ #chatArea{display:none;height:100%;width:100%}
+ #app.chat-open .sidebar{display:none}
+ #app.chat-open #chatArea{display:flex}
+ .message{max-width:86%}
+}
+</style>
+</head>
+
+<body>
+
+<section id="authView">
+ <div class="auth-card">
+  <div class="logo">Only Us ♡</div>
+  <div class="sub">A little space, just for us.</div>
+  <input id="authUsername" class="field hidden" placeholder="Choose username" maxlength="24" autocomplete="username">
+  <input id="authEmail" class="field" type="email" placeholder="Email address" autocomplete="email">
+  <input id="authPassword" class="field" type="password" placeholder="Password" autocomplete="current-password">
+  <button id="authMain" class="primary">Log in</button>
+  <div style="text-align:center">
+   <button id="forgotBtn" class="linkbtn">Forgot password?</button>
+   <button id="authSwitch" class="linkbtn">Create account</button>
+  </div>
+  <div id="authMessage" class="muted"></div>
+ </div>
+</section>
+
+<main id="app" class="hidden">
+
+ <aside class="sidebar">
+  <div class="side-head">
+   <strong>Only Us ♡</strong>
+   <button id="logoutBtn" class="icon-btn">Log out</button>
+  </div>
+
+  <div class="profile-mini">
+   <img id="myAvatar" class="avatar" alt="Profile">
+   <div class="person-info">
+    <b id="myName">My profile</b>
+    <small id="myHandle">@username</small>
+   </div>
+  </div>
+
+  <div class="side-actions">
+   <button id="editProfile" class="icon-btn">Edit profile</button>
+   <button id="profilePhotoBtn" class="icon-btn">Change photo</button>
+  </div>
+
+  <div class="search-wrap">
+   <input id="userSearch" class="field" placeholder="Search username..." autocomplete="off">
+  </div>
+
+  <div class="section-label">Friend requests</div>
+  <div id="requestsList"></div>
+
+  <div class="section-label">Friends</div>
+  <div id="peopleList"></div>
+ </aside>
+
+ <section id="chatArea" class="hidden">
+  <header class="chat-head">
+   <button id="backBtn" class="icon-btn">←</button>
+   <img id="peerAvatar" class="avatar" alt="">
+   <div class="person-info">
+    <b id="peerName">Friend</b>
+    <small id="peerStatus">Offline</small>
+   </div>
+   <button id="deleteChatBtn" class="icon-btn" title="Hide chat">⋮</button>
+  </header>
+
+  <div id="messages"></div>
+  <div id="typingStatus"></div>
+
+  <form id="composeForm" class="compose">
+   <label class="attach" title="Send photo">＋
+    <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+   </label>
+   <input id="messageInput" class="field" placeholder="Write a message..." autocomplete="off">
+   <button class="primary send-btn" type="submit">Send</button>
+  </form>
+ </section>
+
+ <div id="emptyState">
+  <div style="font-size:42px">♡</div>
+  <h2>Your space, your people.</h2>
+  <p>Search a username and start chatting.</p>
+ </div>
+</main>
+
+<div id="modalBg" class="hidden">
+ <div class="modal">
+  <h3 id="modalTitle">Edit</h3>
+  <div id="modalBody"></div>
+  <div class="modal-actions">
+   <button id="modalCancel" class="icon-btn">Cancel</button>
+   <button id="modalSave" class="primary">Save</button>
+  </div>
+ </div>
+</div>
+
+<div id="toast" class="hidden"></div>
+
+<script>
 (()=>{
 'use strict';
 
 const SUPABASE_URL='https://vdmnhlwemcwdmwjfggzn.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_S19oIIHBfauqBpQXwgJsXw_yeZHBsBQ';
+
+if(!window.supabase?.createClient){
+ document.body.innerHTML='<div style="padding:30px;color:white;background:#160b13">Supabase library did not load. Please refresh the page or check your internet connection.</div>';
+ return;
+}
+
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const $=id=>document.getElementById(id);
 
 let user=null,profile=null,currentChat=null,peer=null;
 let channel=null,typingChannel=null,presenceChannel=null;
 let isSignup=false,modalAction=null,searchTimer=null;
-let typingStopTimer=null,typingClearTimer=null,statusRefreshTimer=null;
-let messageMenu=null,friendMenu=null,longPressTimer=null,messageLongPressTimer=null;
-let friendLongPressTriggered=false;
-let startPromise=null;
-let presenceListenerAdded=false;
+let startPromise=null,statusRefreshTimer=null;
+let messageMenu=null,friendMenu=null;
+let typingStopTimer=null,typingClearTimer=null;
+let friendLongPressTriggered=false,longPressTimer=null,messageLongPressTimer=null;
 
 const reactionChoices=['❤️','😂','😮','😢','😡','👍','🔥','🥰','😘','💋','😚'];
 
@@ -44,28 +309,27 @@ function setBusy(el,busy,label){
 }
 
 function initials(p){
- return esc((p?.display_name||p?.username||'?').slice(0,1).toUpperCase());
+ return (p?.display_name||p?.username||'?').slice(0,1).toUpperCase();
 }
 
 function fallbackImage(img,p){
- const letter=(p?.display_name||p?.username||'?').slice(0,1).toUpperCase();
  img.onerror=null;
  img.src='data:image/svg+xml,'+encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" rx="40" fill="#71304f"/><text x="50%" y="56%" font-size="32" text-anchor="middle" fill="white">${letter}</text></svg>`
+  `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" rx="40" fill="#71304f"/><text x="50%" y="56%" font-size="32" text-anchor="middle" fill="white">${initials(p)}</text></svg>`
  );
 }
 
 function avatarHTML(p){
  return p?.avatar_url
-  ?`<img class="avatar" data-avatar-path="${esc(p.avatar_url)}" data-avatar-letter="${initials(p)}" alt="">`
-  :`<div class="avatar">${initials(p)}</div>`;
+ ?`<img class="avatar" data-avatar-path="${esc(p.avatar_url)}" data-avatar-letter="${esc(initials(p))}" alt="">`
+ :`<div class="avatar">${esc(initials(p))}</div>`;
 }
 
 async function signedAsset(path){
  if(!path)return '';
  if(/^https?:\/\//i.test(path))return path;
  const {data,error}=await db.storage.from('chat-photos').createSignedUrl(path,3600);
- if(error){console.warn('Image URL:',error.message);return ''}
+ if(error){console.warn(error.message);return ''}
  return data?.signedUrl||'';
 }
 
@@ -77,8 +341,7 @@ async function hydrateAvatars(root=document){
    img.src=url;
   }else{
    const d=document.createElement('div');
-   d.className='avatar';
-   d.textContent=img.dataset.avatarLetter||'?';
+   d.className='avatar';d.textContent=img.dataset.avatarLetter||'?';
    img.replaceWith(d);
   }
  }
@@ -92,9 +355,7 @@ function enhancePasswordFields(root=document){
   input.parentNode.insertBefore(wrap,input);
   wrap.appendChild(input);
   const toggle=document.createElement('button');
-  toggle.type='button';
-  toggle.className='password-toggle';
-  toggle.textContent='Show';
+  toggle.type='button';toggle.className='password-toggle';toggle.textContent='Show';
   toggle.onclick=()=>{
    const show=input.type==='password';
    input.type=show?'text':'password';
@@ -113,26 +374,17 @@ function openModal(title,body,action){
  $('modalSave').classList.remove('hidden');
  $('modalBg').classList.remove('hidden');
 }
-
 function closeModal(){
  $('modalBg').classList.add('hidden');
  modalAction=null;
 }
-
 $('modalCancel').onclick=closeModal;
-
 $('modalSave').onclick=async()=>{
  if(!modalAction)return;
- const b=$('modalSave');
- setBusy(b,true,'Saving…');
- try{
-  await modalAction();
-  closeModal();
- }catch(e){
-  toast(e.message||'Could not save changes');
- }finally{
-  setBusy(b,false);
- }
+ const b=$('modalSave');setBusy(b,true,'Saving…');
+ try{await modalAction();closeModal()}
+ catch(e){toast(e.message||'Could not save')}
+ finally{setBusy(b,false)}
 };
 
 function authMode(signup){
@@ -143,1049 +395,498 @@ function authMode(signup){
  $('forgotBtn').classList.toggle('hidden',signup);
  $('authMessage').textContent='';
 }
-
 $('authSwitch').onclick=()=>authMode(!isSignup);
 
 $('authMain').onclick=async()=>{
  const email=$('authEmail').value.trim();
  const password=$('authPassword').value;
  const username=$('authUsername').value.trim().toLowerCase();
-
  if(!email||!password)return toast('Enter email and password');
  if(isSignup&&!/^[a-z0-9_]{3,24}$/.test(username))
-  return toast('Username: 3–24 letters, numbers or underscores');
+  return toast('Username must be 3–24 letters, numbers or underscores');
 
- const b=$('authMain');
- setBusy(b,true,'Please wait…');
-
+ const b=$('authMain');setBusy(b,true,'Please wait…');
  try{
   if(isSignup){
    const {data,error}=await db.auth.signUp({email,password});
    if(error)throw error;
-
    if(data.user){
     const {error:pe}=await db.from('profiles').upsert({
-     id:data.user.id,
-     username,
-     display_name:username
+     id:data.user.id,username,display_name:username
     },{onConflict:'id'});
-
     if(pe)throw pe;
    }
-
-   if(data.session){
-    await startApp();
-    toast('Account created successfully');
-   }else{
-    toast('Account created. You can now log in.');
-    authMode(false);
-   }
+   if(data.session){await startApp();toast('Account created')}
+   else{toast('Account created. You can now log in.');authMode(false)}
   }else{
    const {error}=await db.auth.signInWithPassword({email,password});
    if(error)throw error;
-
    await startApp();
   }
- }catch(e){
-  console.error('Authentication:',e);
-  toast(e.message||'Authentication failed');
- }finally{
-  setBusy(b,false);
- }
+ }catch(e){console.error(e);toast(e.message||'Login failed')}
+ finally{setBusy(b,false)}
 };
 
 $('forgotBtn').onclick=async()=>{
  const email=$('authEmail').value.trim();
  if(!email)return toast('Enter your email first');
-
  const {error}=await db.auth.resetPasswordForEmail(email,{
   redirectTo:location.origin+location.pathname
  });
-
- toast(error?error.message:'If the email is registered, a reset link has been sent.');
+ toast(error?error.message:'If the email is registered, a reset link was sent.');
 };
 
 async function loadProfile(){
- const {data,error}=await db.from('profiles')
-  .select('*').eq('id',user.id).single();
-
+ const {data,error}=await db.from('profiles').select('*').eq('id',user.id).single();
  if(error)throw error;
  profile=data;
-
  $('myName').textContent=data.display_name||data.username;
  $('myHandle').textContent='@'+data.username;
-
  const url=await signedAsset(data.avatar_url);
-
- if(url){
-  $('myAvatar').onerror=()=>fallbackImage($('myAvatar'),data);
-  $('myAvatar').src=url;
- }else{
-  fallbackImage($('myAvatar'),data);
- }
+ if(url){$('myAvatar').onerror=()=>fallbackImage($('myAvatar'),data);$('myAvatar').src=url}
+ else fallbackImage($('myAvatar'),data);
 }
 
 async function startApp(){
  if(startPromise)return startPromise;
-
  startPromise=(async()=>{
   const {data,error}=await db.auth.getUser();
   if(error)console.warn(error);
-
   user=data.user;
-
   if(!user){
    $('authView').classList.remove('hidden');
    $('app').classList.add('hidden');
    return;
   }
-
   try{
    await loadProfile();
-
    $('authView').classList.add('hidden');
    $('app').classList.remove('hidden');
-
    await Promise.all([loadPeople(),loadRequests()]);
    await startPresence();
-  }catch(e){
-   console.error('Start app:',e);
-   toast('Profile setup: '+e.message);
-  }
+  }catch(e){console.error(e);toast('Profile setup: '+e.message)}
  })();
-
- try{
-  return await startPromise;
- }finally{
-  startPromise=null;
- }
+ try{return await startPromise}finally{startPromise=null}
 }
 
 async function loadPeople(){
  try{
-  const {data:accepted,error:ae}=await db.from('friend_requests')
-   .select('sender_id,receiver_id')
-   .eq('status','accepted')
+  const {data:accepted,error}=await db.from('friend_requests')
+   .select('sender_id,receiver_id').eq('status','accepted')
    .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`);
-
-  if(ae)throw ae;
-
-  const friendIds=[...new Set((accepted||[]).map(r=>
-   r.sender_id===user.id?r.receiver_id:r.sender_id
-  ).filter(Boolean))];
-
-  if(!friendIds.length){
-   window.__onlyUsPeople=[];
-   window.__onlyUsFriendChats={};
-   $('peopleList').innerHTML='<div class="hint" style="padding:10px">No friends yet. Search for a username above.</div>';
+  if(error)throw error;
+  const ids=[...new Set((accepted||[]).map(r=>r.sender_id===user.id?r.receiver_id:r.sender_id))];
+  if(!ids.length){
+   window.__onlyUsPeople=[];window.__onlyUsFriendChats={};
+   $('peopleList').innerHTML='<div class="hint">No friends yet. Search for a username.</div>';
    return;
   }
-
   const {data:profiles,error:pe}=await db.from('profiles')
-   .select('id,username,display_name,avatar_url,last_seen_at')
-   .in('id',friendIds);
-
+   .select('id,username,display_name,avatar_url,last_seen_at').in('id',ids);
   if(pe)throw pe;
-
-  const {data:myRows,error:me}=await db.from('conversation_members')
-   .select('conversation_id')
-   .eq('user_id',user.id);
-
+  const {data:mine,error:me}=await db.from('conversation_members')
+   .select('conversation_id').eq('user_id',user.id);
   if(me)throw me;
-
-  const myIds=[...new Set((myRows||[]).map(x=>x.conversation_id))];
-  let peerRows=[];
-
-  if(myIds.length){
+  const chatIds=[...new Set((mine||[]).map(x=>x.conversation_id))];
+  let shared=[];
+  if(chatIds.length){
    const {data,error}=await db.from('conversation_members')
-    .select('conversation_id,user_id')
-    .in('conversation_id',myIds)
-    .in('user_id',friendIds);
-
-   if(error)throw error;
-   peerRows=data||[];
+    .select('conversation_id,user_id').in('conversation_id',chatIds).in('user_id',ids);
+   if(error)throw error;shared=data||[];
   }
-
-  const shared={};
-
-  peerRows.forEach(r=>{
-   if(!shared[r.user_id])shared[r.user_id]=[];
-   if(!shared[r.user_id].includes(r.conversation_id))
-    shared[r.user_id].push(r.conversation_id);
-  });
-
-  const allIds=[...new Set(Object.values(shared).flat())];
+  const map={};
+  shared.forEach(x=>(map[x.user_id]??=[]).push(x.conversation_id));
+  const all=[...new Set(shared.map(x=>x.conversation_id))];
   let latest={};
-
-  if(allIds.length){
-   const {data:msgs,error}=await db.from('messages')
-    .select('conversation_id,created_at')
-    .in('conversation_id',allIds)
-    .order('created_at',{ascending:false});
-
-   if(!error){
-    (msgs||[]).forEach(m=>{
-     if(!latest[m.conversation_id])latest[m.conversation_id]=m.created_at;
-    });
-   }
+  if(all.length){
+   const {data}=await db.from('messages').select('conversation_id,created_at')
+    .in('conversation_id',all).order('created_at',{ascending:false});
+   (data||[]).forEach(m=>{if(!latest[m.conversation_id])latest[m.conversation_id]=m.created_at});
   }
-
   const {data:hidden,error:he}=await db.from('hidden_conversations')
-   .select('conversation_id')
-   .eq('user_id',user.id);
-
+   .select('conversation_id').eq('user_id',user.id);
   if(he)throw he;
-
-  const hiddenIds=new Set((hidden||[]).map(x=>x.conversation_id));
-  const friendChats={};
-
+  const hidden=new Set((hidden||[]).map(x=>x.conversation_id));
+  const chats={};
   (profiles||[]).forEach(p=>{
-   const chats=shared[p.id]||[];
-   if(!chats.length)return;
-
-   chats.sort((a,b)=>
-    new Date(latest[b]||0)-new Date(latest[a]||0)
-   );
-
-   const chosen=chats.find(id=>!hiddenIds.has(id))||chats[0];
-
-   friendChats[p.id]={
-    ...p,
-    conversation_id:chosen,
-    isHidden:hiddenIds.has(chosen)
-   };
+   const idsFor=map[p.id]||[];
+   if(!idsFor.length)return;
+   idsFor.sort((a,b)=>new Date(latest[b]||0)-new Date(latest[a]||0));
+   const chosen=idsFor.find(x=>!hidden.has(x))||idsFor[0];
+   chats[p.id]={...p,conversation_id:chosen,isHidden:hidden.has(chosen)};
   });
-
-  window.__onlyUsFriendChats=friendChats;
-  window.__onlyUsPeople=Object.values(friendChats).filter(p=>!p.isHidden);
-
+  window.__onlyUsFriendChats=chats;
+  window.__onlyUsPeople=Object.values(chats).filter(p=>!p.isHidden);
   $('peopleList').innerHTML=window.__onlyUsPeople.map(p=>`
    <div class="person" data-chat="${esc(p.conversation_id)}" data-peer="${esc(p.id)}">
     ${avatarHTML(p)}
-    <div class="person-info">
-     <b>${esc(p.display_name||p.username||'Friend')}</b>
-     <small>@${esc(p.username||'username')} · <span data-person-status="${esc(p.id)}">Last seen recently</span></small>
-    </div>
-    <button type="button" class="friend-remove-btn" data-remove-friend="${esc(p.id)}" title="Remove friend">×</button>
-   </div>
-  `).join('')||'<div class="hint" style="padding:10px">No visible chats. Search for a friend to reopen a hidden chat.</div>';
-
-  await hydrateAvatars($('peopleList'));
-  refreshPresenceLabels();
-
- }catch(error){
-  console.error('loadPeople:',error);
-  $('peopleList').innerHTML=`<div class="hint" style="padding:10px">Could not load friends: ${esc(error.message)}</div>`;
-  throw error;
+    <div class="person-info"><b>${esc(p.display_name||p.username)}</b>
+    <small>@${esc(p.username)} · <span data-person-status="${esc(p.id)}">Offline</span></small></div>
+    <button class="friend-remove-btn" data-remove-friend="${esc(p.id)}" type="button">×</button>
+   </div>`).join('')||'<div class="hint">No visible chats. Search to reopen a hidden chat.</div>';
+  await hydrateAvatars($('peopleList'));refreshPresenceLabels();
+ }catch(e){
+  console.error('Friends:',e);
+  $('peopleList').innerHTML=`<div class="hint">Could not load friends: ${esc(e.message)}</div>`;
  }
 }
 
 async function loadRequests(){
  const {data,error}=await db.from('friend_requests')
-  .select('id,sender_id,profiles!friend_requests_sender_id_fkey(id,username,display_name,avatar_url)')
-  .eq('receiver_id',user.id)
-  .eq('status','pending');
-
- if(error){
-  console.error('Requests:',error);
-  $('requestsList').innerHTML='<div class="hint">Could not load requests</div>';
-  return;
+  .select('id,sender_id').eq('receiver_id',user.id).eq('status','pending');
+ if(error){$('requestsList').innerHTML='<div class="hint">Could not load requests</div>';return}
+ const rows=[];
+ for(const r of data||[]){
+  const {data:p}=await db.from('profiles').select('id,username,display_name,avatar_url')
+   .eq('id',r.sender_id).single();
+  if(p)rows.push({...r,profile:p});
  }
-
- $('requestsList').innerHTML=(data||[]).map(r=>`
-  <div class="person">
-   ${avatarHTML(r.profiles)}
-   <div class="person-info">
-    <b>${esc(r.profiles?.display_name||r.profiles?.username)}</b>
-    <small>@${esc(r.profiles?.username)}</small>
-   </div>
+ $('requestsList').innerHTML=rows.map(r=>`
+  <div class="person">${avatarHTML(r.profile)}
+   <div class="person-info"><b>${esc(r.profile.display_name||r.profile.username)}</b>
+   <small>@${esc(r.profile.username)}</small></div>
    <button class="icon-btn accept" data-id="${esc(r.id)}">✓</button>
-  </div>
- `).join('')||'<div class="hint" style="padding:8px 10px">No new requests</div>';
-
+  </div>`).join('')||'<div class="hint">No new requests</div>';
  await hydrateAvatars($('requestsList'));
-
  document.querySelectorAll('.accept').forEach(b=>b.onclick=async()=>{
   setBusy(b,true,'…');
-
-  const {error}=await db.rpc('accept_friend_request',{
-   p_request_id:b.dataset.id
-  });
-
-  if(error){
-   toast(error.message);
-   setBusy(b,false);
-  }else{
-   toast('Friend request accepted');
-   await loadRequests();
-   await loadPeople();
-  }
+  const {error}=await db.rpc('accept_friend_request',{p_request_id:b.dataset.id});
+  if(error){toast(error.message);setBusy(b,false)}
+  else{toast('Friend request accepted');await loadRequests();await loadPeople()}
  });
 }
 
 $('userSearch').oninput=()=>{
- clearTimeout(searchTimer);
- searchTimer=setTimeout(searchUsers,300);
+ clearTimeout(searchTimer);searchTimer=setTimeout(searchUsers,300);
 };
 
 async function searchUsers(){
  if(!user)return;
-
  const q=$('userSearch').value.trim().toLowerCase();
-
- if(q.length<2){
-  await loadPeople();
-  return;
- }
-
+ if(q.length<2){await loadPeople();return}
  const {data,error}=await db.from('profiles')
-  .select('id,username,display_name,avatar_url')
-  .ilike('username',q+'%')
-  .neq('id',user.id)
-  .limit(10);
-
+  .select('id,username,display_name,avatar_url').ilike('username',q+'%')
+  .neq('id',user.id).limit(10);
  if(error)return toast(error.message);
-
  const {data:relations,error:re}=await db.from('friend_requests')
-  .select('sender_id,receiver_id,status')
-  .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`);
-
+  .select('sender_id,receiver_id,status').or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`);
  if(re)return toast(re.message);
 
  $('peopleList').innerHTML=(data||[]).map(p=>{
   const existing=window.__onlyUsFriendChats?.[p.id];
-
-  const relation=(relations||[]).find(r=>
-   (r.sender_id===user.id&&r.receiver_id===p.id)||
-   (r.sender_id===p.id&&r.receiver_id===user.id)
-  );
-
+  const rel=(relations||[]).find(r=>
+   (r.sender_id===user.id&&r.receiver_id===p.id)||(r.sender_id===p.id&&r.receiver_id===user.id));
   const action=existing
    ?`<button class="icon-btn search-open" data-chat="${esc(existing.conversation_id)}" data-id="${esc(p.id)}">Open</button>`
-   :relation?.status==='accepted'
+   :rel?.status==='accepted'
    ?`<button class="icon-btn start-friend-chat" data-id="${esc(p.id)}">Open chat</button>`
-   :relation?.status==='pending'
-   ?'<span class="hint">Pending</span>'
+   :rel?.status==='pending'
+   ?'<span class="muted">Pending</span>'
    :`<button class="icon-btn add-friend" data-id="${esc(p.id)}">＋</button>`;
-
-  return `
-   <div class="person">
-    ${avatarHTML(p)}
-    <div class="person-info">
-     <b>${esc(p.display_name||p.username)}</b>
-     <small>@${esc(p.username)}</small>
-    </div>
-    ${action}
-   </div>
-  `;
- }).join('')||'<div class="hint" style="padding:10px">No users found.</div>';
-
+  return `<div class="person">${avatarHTML(p)}
+   <div class="person-info"><b>${esc(p.display_name||p.username)}</b><small>@${esc(p.username)}</small></div>${action}</div>`;
+ }).join('')||'<div class="hint">No users found.</div>';
  await hydrateAvatars($('peopleList'));
 
- document.querySelectorAll('.search-open').forEach(b=>
-  b.onclick=()=>openChat(b.dataset.chat,b.dataset.id)
- );
-
+ document.querySelectorAll('.search-open').forEach(b=>b.onclick=()=>openChat(b.dataset.chat,b.dataset.id));
  document.querySelectorAll('.start-friend-chat').forEach(b=>b.onclick=async()=>{
   setBusy(b,true,'Opening…');
-
-  const {data,error}=await db.rpc('get_or_create_friend_conversation',{
-   p_friend_id:b.dataset.id
-  });
-
-  if(error){
-   setBusy(b,false);
-   return toast(error.message);
-  }
-
+  const {data,error}=await db.rpc('get_or_create_friend_conversation',{p_friend_id:b.dataset.id});
+  if(error){setBusy(b,false);return toast(error.message)}
   await loadPeople();
-  await openChat(data,b.dataset.id);
+  const chatId=typeof data==='string'?data:(data?.conversation_id||data?.id||data?.[0]?.conversation_id);
+  if(!chatId)return toast('Conversation ID was not returned by the database function.');
+  await openChat(chatId,b.dataset.id);
  });
-
  document.querySelectorAll('.add-friend').forEach(b=>b.onclick=async()=>{
   setBusy(b,true,'…');
-
   const {error}=await db.from('friend_requests').insert({
-   sender_id:user.id,
-   receiver_id:b.dataset.id,
-   status:'pending'
+   sender_id:user.id,receiver_id:b.dataset.id,status:'pending'
   });
-
-  if(error){
-   setBusy(b,false);
-   toast(error.message);
-  }else{
-   toast('Friend request sent');
-   await searchUsers();
-  }
+  if(error){setBusy(b,false);toast(error.message)}
+  else{toast('Friend request sent');await searchUsers()}
  });
 }
 
 async function openChat(chatId,peerId){
- const {error:unhideError}=await db.rpc('unhide_conversation_for_me',{
-  p_conversation_id:chatId
- });
-
+ const {error:unhideError}=await db.rpc('unhide_conversation_for_me',{p_conversation_id:chatId});
  if(unhideError)return toast(unhideError.message);
-
- const {data:p,error}=await db.from('profiles')
-  .select('*').eq('id',peerId).single();
-
+ const {data:p,error}=await db.from('profiles').select('*').eq('id',peerId).single();
  if(error)return toast(error.message);
-
- currentChat=chatId;
- peer=p;
-
+ currentChat=chatId;peer=p;
  $('emptyState').classList.add('hidden');
  $('chatArea').classList.remove('hidden');
  $('app').classList.add('chat-open');
-
  $('peerName').textContent=p.display_name||p.username;
  $('peerStatus').textContent='Checking status…';
-
  const url=await signedAsset(p.avatar_url);
-
- if(url){
-  $('peerAvatar').onerror=()=>fallbackImage($('peerAvatar'),p);
-  $('peerAvatar').src=url;
- }else{
-  fallbackImage($('peerAvatar'),p);
- }
-
- await loadMessages();
- subscribeChat();
- refreshPresenceLabels();
+ if(url){$('peerAvatar').onerror=()=>fallbackImage($('peerAvatar'),p);$('peerAvatar').src=url}
+ else fallbackImage($('peerAvatar'),p);
+ await loadMessages();subscribeChat();refreshPresenceLabels();
 }
 
 async function loadMessages(){
  if(!currentChat||!user)return;
-
  const chatAtStart=currentChat;
-
  const {data,error}=await db.from('messages')
   .select('id,conversation_id,sender_id,content,image_url,created_at,seen_at,deleted_at')
-  .eq('conversation_id',chatAtStart)
-  .order('created_at',{ascending:true});
-
- if(error){
-  console.error('Messages:',error);
-  toast(error.message);
-  return;
- }
-
+  .eq('conversation_id',chatAtStart).order('created_at',{ascending:true});
+ if(error){console.error(error);toast(error.message);return}
  const ids=(data||[]).map(m=>m.id);
  let hidden=new Set();
-
  if(ids.length){
-  const {data:h,error:hideError}=await db.from('message_hidden')
-   .select('message_id')
-   .eq('user_id',user.id)
-   .in('message_id',ids);
-
-  if(!hideError)hidden=new Set((h||[]).map(x=>x.message_id));
+  const {data:h}=await db.from('message_hidden').select('message_id')
+   .eq('user_id',user.id).in('message_id',ids);
+  hidden=new Set((h||[]).map(x=>x.message_id));
  }
-
  const visible=(data||[]).filter(m=>!hidden.has(m.id));
  const visibleIds=visible.map(m=>m.id);
- let reactionMap={};
-
+ let rxMap={};
  if(visibleIds.length){
-  const {data:rx,error:rxError}=await db.from('message_reactions')
-   .select('message_id,user_id,emoji')
+  const {data:rx}=await db.from('message_reactions').select('message_id,user_id,emoji')
    .in('message_id',visibleIds);
-
-  if(!rxError){
-   (rx||[]).forEach(r=>{
-    (reactionMap[r.message_id]??=[]).push(r);
-   });
-  }
+  (rx||[]).forEach(r=>(rxMap[r.message_id]??=[]).push(r));
  }
-
  const hydrated=await Promise.all(visible.map(async m=>{
-  if(m.image_url&&!m.image_url.startsWith('http')){
-   const url=await signedAsset(m.image_url);
-   return {...m,image_url:url};
-  }
+  if(m.image_url&&!m.image_url.startsWith('http'))
+   return {...m,image_url:await signedAsset(m.image_url)};
   return m;
  }));
-
  if(currentChat!==chatAtStart)return;
-
- $('messages').innerHTML=hydrated.map(m=>
-  renderMessage(m,reactionMap[m.id]||[])
- ).join('');
-
+ $('messages').innerHTML=hydrated.map(m=>renderMessage(m,rxMap[m.id]||[])).join('');
  $('messages').scrollTop=$('messages').scrollHeight;
-
- const unread=visible.filter(m=>
-  m.sender_id!==user.id&&!m.seen_at&&!m.deleted_at
- ).map(m=>m.id);
-
+ const unread=visible.filter(m=>m.sender_id!==user.id&&!m.seen_at&&!m.deleted_at).map(m=>m.id);
  if(unread.length){
-  const {error:seenError}=await db.from('messages')
-   .update({seen_at:new Date().toISOString()})
-   .in('id',unread);
-
-  if(seenError)console.warn('Seen update:',seenError.message);
+  const {error:seenError}=await db.from('messages').update({seen_at:new Date().toISOString()}).in('id',unread);
+  if(seenError)console.warn(seenError.message);
  }
 }
 
 function renderMessage(m,reactions=[]){
- const mine=m.sender_id===user.id;
- const deleted=!!m.deleted_at;
- const time=new Date(m.created_at).toLocaleTimeString([],{
-  hour:'2-digit',minute:'2-digit'
- });
-
+ const mine=m.sender_id===user.id,deleted=!!m.deleted_at;
+ const time=new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
  const emojiOnly=!!m.content&&/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+$/u.test(m.content);
-
- const messageText=m.content
-  ?(emojiOnly
-    ?`<span class="emoji-message">${esc(m.content)}</span>`
-    :esc(m.content).replace(/\n/g,'<br>'))
-  :'';
-
- const content=deleted
-  ?'<div class="bubble deleted">This message was deleted</div>'
-  :`<div class="bubble">${m.image_url?`<img src="${esc(m.image_url)}" alt="Shared photo">`:''}${messageText}</div>`;
-
+ const text=m.content?(emojiOnly?`<span class="emoji-message">${esc(m.content)}</span>`:esc(m.content).replace(/\n/g,'<br>')):'';
+ const content=deleted?'<div class="bubble deleted">This message was deleted</div>'
+  :`<div class="bubble">${m.image_url?`<img src="${esc(m.image_url)}" alt="Shared photo">`:''}${text}</div>`;
  const grouped={};
-
  reactions.forEach(r=>{
-  grouped[r.emoji]??={count:0,mine:false};
-  grouped[r.emoji].count++;
+  grouped[r.emoji]??={count:0,mine:false};grouped[r.emoji].count++;
   if(r.user_id===user.id)grouped[r.emoji].mine=true;
  });
-
- const reactionHTML=Object.entries(grouped).map(([emoji,v])=>
-  `<button type="button" class="reaction-chip ${v.mine?'mine':''}" data-react-msg="${esc(m.id)}" data-emoji="${esc(emoji)}">${emoji} ${v.count}</button>`
+ const reactionHTML=Object.entries(grouped).map(([e,v])=>
+  `<button class="reaction-chip ${v.mine?'mine':''}" data-react-msg="${esc(m.id)}" data-emoji="${esc(e)}">${e} ${v.count}</button>`
  ).join('');
-
- return `
-  <div class="message ${mine?'mine':''}" data-message="${esc(m.id)}" data-deleted="${deleted}">
-   ${content}
-   ${reactionHTML?`<div class="reaction-row">${reactionHTML}</div>`:''}
-   <div class="msg-foot">
-    <span>${time}</span>
-    ${mine&&!deleted?`<span>${m.seen_at?'Seen':'Sent'}</span>`:''}
-    <button type="button" class="msg-menu" data-msgid="${esc(m.id)}" data-deleted="${deleted}">⋮</button>
-   </div>
-  </div>
- `;
+ return `<div class="message ${mine?'mine':''}" data-message="${esc(m.id)}" data-deleted="${deleted}">
+  ${content}${reactionHTML?`<div class="reaction-row">${reactionHTML}</div>`:''}
+  <div class="msg-foot"><span>${time}</span>${mine&&!deleted?`<span>${m.seen_at?'Seen':'Sent'}</span>`:''}
+  <button class="msg-menu" data-msgid="${esc(m.id)}" data-deleted="${deleted}">⋮</button></div></div>`;
 }
 
-/* MESSAGE MENU */
-
-function closeMessageMenu(){
- if(messageMenu){
-  messageMenu.remove();
-  messageMenu=null;
- }
-}
-
+function closeMessageMenu(){if(messageMenu){messageMenu.remove();messageMenu=null}}
 function showMessageMenu(id,deleted,x,y){
- closeMessageMenu();
- if(deleted)return;
-
- const menu=document.createElement('div');
- menu.className='message-menu-pop';
-
- menu.innerHTML=`
-  <div class="reaction-picker">
-   ${reactionChoices.map(e=>`<button type="button" data-pick-emoji="${esc(e)}">${e}</button>`).join('')}
-  </div>
-  <button type="button" class="menu-action" data-menu-action="delete-me">Delete for me</button>
-  <button type="button" class="menu-action delete" data-menu-action="delete-all">Delete for everyone</button>
- `;
-
- document.body.appendChild(menu);
- messageMenu=menu;
-
- const w=menu.offsetWidth;
- const h=menu.offsetHeight;
-
- menu.style.left=Math.max(8,Math.min(x||20,innerWidth-w-8))+'px';
- menu.style.top=Math.max(8,Math.min(y||20,innerHeight-h-8))+'px';
-
- menu.addEventListener('click',async e=>{
+ closeMessageMenu();if(deleted)return;
+ const menu=document.createElement('div');menu.className='message-menu-pop';
+ menu.innerHTML=`<div class="reaction-picker">${reactionChoices.map(e=>`<button data-pick-emoji="${e}">${e}</button>`).join('')}</div>
+ <button class="menu-action" data-menu-action="delete-me">Delete for me</button>
+ <button class="menu-action delete" data-menu-action="delete-all">Delete for everyone</button>`;
+ document.body.appendChild(menu);messageMenu=menu;
+ menu.style.left=Math.max(8,Math.min(x||20,innerWidth-menu.offsetWidth-8))+'px';
+ menu.style.top=Math.max(8,Math.min(y||20,innerHeight-menu.offsetHeight-8))+'px';
+ menu.onclick=async e=>{
   const react=e.target.closest('[data-pick-emoji]');
-  const actionButton=e.target.closest('[data-menu-action]');
-
-  if(!react&&!actionButton)return;
-
-  e.preventDefault();
-  e.stopPropagation();
-
-  const buttons=[...menu.querySelectorAll('button')];
-  buttons.forEach(b=>b.disabled=true);
-
+  const action=e.target.closest('[data-menu-action]');
+  if(!react&&!action)return;
   try{
-   if(react){
-    await toggleReaction(id,react.dataset.pickEmoji);
-    closeMessageMenu();
-    return;
-   }
-
-   const action=actionButton.dataset.menuAction;
-
-   if(action==='delete-me'){
-    actionButton.textContent='Deleting…';
-
-    const {error}=await db.rpc('hide_message_for_me',{
-     p_message_id:id
-    });
-
+   if(react){await toggleReaction(id,react.dataset.pickEmoji);closeMessageMenu();return}
+   if(action.dataset.menuAction==='delete-me'){
+    const {error}=await db.rpc('hide_message_for_me',{p_message_id:id});
     if(error)throw error;
-
-    closeMessageMenu();
-    await loadMessages();
-    toast('Message deleted for you');
+    closeMessageMenu();await loadMessages();toast('Message deleted for you');
    }
-
-   if(action==='delete-all'){
-    if(!confirm('Delete this message for both people?')){
-     buttons.forEach(b=>b.disabled=false);
-     return;
-    }
-
-    actionButton.textContent='Deleting…';
-
-    const {error}=await db.rpc('delete_message_for_everyone',{
-     p_message_id:id
-    });
-
+   if(action.dataset.menuAction==='delete-all'){
+    if(!confirm('Delete this message for both people?'))return;
+    const {error}=await db.rpc('delete_message_for_everyone',{p_message_id:id});
     if(error)throw error;
-
-    closeMessageMenu();
-    await loadMessages();
-    toast('Message deleted for everyone');
+    closeMessageMenu();await loadMessages();toast('Message deleted for everyone');
    }
-
-  }catch(error){
-   console.error('Message action:',error);
-   toast(error.message||'Action failed');
-   buttons.forEach(b=>b.disabled=false);
-  }
- });
+  }catch(err){toast(err.message||'Action failed')}
+ };
 }
-
-/* REACTIONS - DOES NOT REQUIRE AN ID COLUMN */
 
 async function toggleReaction(messageId,emoji){
  try{
-  const {data:existing,error:findError}=await db.from('message_reactions')
-   .select('message_id')
-   .eq('message_id',messageId)
-   .eq('user_id',user.id)
-   .eq('emoji',emoji)
-   .limit(1);
-
-  if(findError)throw findError;
-
-  if(existing?.length){
-   const {error}=await db.from('message_reactions')
-    .delete()
-    .eq('message_id',messageId)
-    .eq('user_id',user.id)
-    .eq('emoji',emoji);
-
-   if(error)throw error;
+  const {data,error}=await db.from('message_reactions').select('message_id')
+   .eq('message_id',messageId).eq('user_id',user.id).eq('emoji',emoji).limit(1);
+  if(error)throw error;
+  if(data?.length){
+   const {error:e}=await db.from('message_reactions').delete()
+    .eq('message_id',messageId).eq('user_id',user.id).eq('emoji',emoji);
+   if(e)throw e;
   }else{
-   const {error}=await db.from('message_reactions').insert({
-    message_id:messageId,
-    user_id:user.id,
-    emoji
-   });
-
-   if(error)throw error;
+   const {error:e}=await db.from('message_reactions').insert({message_id:messageId,user_id:user.id,emoji});
+   if(e)throw e;
   }
-
   await loadMessages();
-
- }catch(error){
-  console.error('Reaction error:',error);
-  toast(error.message||'Could not send reaction');
- }
+ }catch(e){toast(e.message||'Could not send reaction')}
 }
 
 $('messages').addEventListener('click',e=>{
  const chip=e.target.closest('[data-react-msg]');
-
- if(chip){
-  e.preventDefault();
-  e.stopPropagation();
-  toggleReaction(chip.dataset.reactMsg,chip.dataset.emoji);
-  return;
- }
-
+ if(chip){e.preventDefault();toggleReaction(chip.dataset.reactMsg,chip.dataset.emoji);return}
  const b=e.target.closest('.msg-menu');
-
- if(b){
-  e.preventDefault();
-  e.stopPropagation();
-
-  showMessageMenu(
-   b.dataset.msgid,
-   b.dataset.deleted==='true',
-   e.clientX||innerWidth/2,
-   e.clientY||innerHeight/2
-  );
- }
+ if(b){e.preventDefault();showMessageMenu(b.dataset.msgid,b.dataset.deleted==='true',e.clientX||innerWidth/2,e.clientY||innerHeight/2)}
 });
-
 $('messages').addEventListener('contextmenu',e=>{
- const msg=e.target.closest('.message');
- if(!msg)return;
-
- e.preventDefault();
-
- showMessageMenu(
-  msg.dataset.message,
-  msg.dataset.deleted==='true',
-  e.clientX,e.clientY
- );
+ const m=e.target.closest('.message');if(!m)return;
+ e.preventDefault();showMessageMenu(m.dataset.message,m.dataset.deleted==='true',e.clientX,e.clientY);
 });
-
 $('messages').addEventListener('pointerdown',e=>{
- const msg=e.target.closest('.message');
- if(!msg||e.target.closest('button'))return;
-
+ const m=e.target.closest('.message');if(!m||e.target.closest('button'))return;
  clearTimeout(messageLongPressTimer);
-
- const id=msg.dataset.message;
- const deleted=msg.dataset.deleted==='true';
- const x=e.clientX,y=e.clientY;
-
- messageLongPressTimer=setTimeout(()=>{
-  showMessageMenu(id,deleted,x||innerWidth/2,y||innerHeight/2);
- },550);
+ const id=m.dataset.message,del=m.dataset.deleted==='true',x=e.clientX,y=e.clientY;
+ messageLongPressTimer=setTimeout(()=>showMessageMenu(id,del,x,y),550);
 });
-
 ['pointerup','pointercancel','pointermove','scroll'].forEach(ev=>
- $('messages').addEventListener(ev,()=>{
-  clearTimeout(messageLongPressTimer);
- },{passive:true})
+ $('messages').addEventListener(ev,()=>clearTimeout(messageLongPressTimer),{passive:true})
 );
-
 document.addEventListener('click',e=>{
- if(messageMenu&&!e.target.closest('.message-menu-pop')&&!e.target.closest('.msg-menu')){
-  closeMessageMenu();
- }
+ if(messageMenu&&!e.target.closest('.message-menu-pop')&&!e.target.closest('.msg-menu'))closeMessageMenu();
 });
-
-/* FRIEND REMOVAL */
-
-function closeFriendMenu(){
- if(friendMenu){
-  friendMenu.remove();
-  friendMenu=null;
- }
-}
 
 async function removeFriend(peerId){
  const person=(window.__onlyUsFriendChats||{})[peerId];
  const name=person?.display_name||person?.username||'this friend';
-
  if(!confirm(`Remove ${name} from your friends? Existing messages will be preserved.`))return;
-
- const {error}=await db.rpc('remove_friend',{
-  p_friend_id:peerId
- });
-
+ const {error}=await db.rpc('remove_friend',{p_friend_id:peerId});
  if(error)return toast(error.message);
-
  if(peer?.id===peerId){
-  currentChat=null;
-  peer=null;
-
+  currentChat=null;peer=null;
   if(channel)db.removeChannel(channel);
   if(typingChannel)db.removeChannel(typingChannel);
-
-  channel=null;
-  typingChannel=null;
-
-  $('chatArea').classList.add('hidden');
-  $('emptyState').classList.remove('hidden');
+  channel=null;typingChannel=null;
+  $('chatArea').classList.add('hidden');$('emptyState').classList.remove('hidden');
   $('app').classList.remove('chat-open');
  }
-
- await loadPeople();
- toast('Friend removed. Existing messages are preserved.');
+ await loadPeople();toast('Friend removed. Messages are preserved.');
 }
-
 $('peopleList').addEventListener('click',async e=>{
  const remove=e.target.closest('[data-remove-friend]');
-
- if(remove){
-  e.preventDefault();
-  e.stopPropagation();
-
-  remove.disabled=true;
-  await removeFriend(remove.dataset.removeFriend);
-  remove.disabled=false;
-  return;
- }
-
- if(friendLongPressTriggered){
-  friendLongPressTriggered=false;
-  e.preventDefault();
-  return;
- }
-
+ if(remove){e.preventDefault();e.stopPropagation();remove.disabled=true;await removeFriend(remove.dataset.removeFriend);remove.disabled=false;return}
+ if(friendLongPressTriggered){friendLongPressTriggered=false;e.preventDefault();return}
  const row=e.target.closest('[data-chat]');
-
  if(row)openChat(row.dataset.chat,row.dataset.peer);
 });
-
-function showFriendMenu(peerId,x,y){
+function closeFriendMenu(){if(friendMenu){friendMenu.remove();friendMenu=null}}
+function showFriendMenu(id,x,y){
  closeFriendMenu();
-
- const menu=document.createElement('div');
- menu.className='friend-menu-pop';
- menu.innerHTML='<button type="button" class="menu-action delete">Remove Friend</button>';
-
- document.body.appendChild(menu);
- friendMenu=menu;
-
+ const menu=document.createElement('div');menu.className='friend-menu-pop';
+ menu.innerHTML='<button class="menu-action delete">Remove Friend</button>';
+ document.body.appendChild(menu);friendMenu=menu;
  menu.style.left=Math.max(8,Math.min(x,innerWidth-menu.offsetWidth-8))+'px';
  menu.style.top=Math.max(8,Math.min(y,innerHeight-menu.offsetHeight-8))+'px';
-
- menu.querySelector('button').onclick=async()=>{
-  closeFriendMenu();
-  await removeFriend(peerId);
- };
+ menu.querySelector('button').onclick=async()=>{closeFriendMenu();await removeFriend(id)};
 }
-
 $('peopleList').addEventListener('contextmenu',e=>{
- const row=e.target.closest('[data-chat]');
- if(!row)return;
-
- e.preventDefault();
- showFriendMenu(row.dataset.peer,e.clientX,e.clientY);
+ const row=e.target.closest('[data-chat]');if(!row)return;
+ e.preventDefault();showFriendMenu(row.dataset.peer,e.clientX,e.clientY);
 });
-
 $('peopleList').addEventListener('pointerdown',e=>{
- const row=e.target.closest('[data-chat]');
- if(!row||e.pointerType==='mouse')return;
-
- clearTimeout(longPressTimer);
- friendLongPressTriggered=false;
-
- const id=row.dataset.peer;
- const x=e.clientX,y=e.clientY;
-
- longPressTimer=setTimeout(()=>{
-  friendLongPressTriggered=true;
-  showFriendMenu(id,x,y);
- },600);
+ const row=e.target.closest('[data-chat]');if(!row||e.pointerType==='mouse')return;
+ clearTimeout(longPressTimer);friendLongPressTriggered=false;
+ const id=row.dataset.peer,x=e.clientX,y=e.clientY;
+ longPressTimer=setTimeout(()=>{friendLongPressTriggered=true;showFriendMenu(id,x,y)},600);
 });
-
 ['pointerup','pointercancel','pointermove','scroll'].forEach(ev=>
- $('peopleList').addEventListener(ev,()=>{
-  clearTimeout(longPressTimer);
- },{passive:true})
+ $('peopleList').addEventListener(ev,()=>clearTimeout(longPressTimer),{passive:true})
 );
-
 document.addEventListener('click',e=>{
- if(friendMenu&&!e.target.closest('.friend-menu-pop')){
-  closeFriendMenu();
- }
+ if(friendMenu&&!e.target.closest('.friend-menu-pop'))closeFriendMenu();
 });
-
-/* REALTIME */
 
 function subscribeChat(){
  if(channel)db.removeChannel(channel);
-
  const chatAtStart=currentChat;
-
  channel=db.channel('chat-'+chatAtStart)
-  .on('postgres_changes',{
-   event:'*',
-   schema:'public',
-   table:'messages',
-   filter:'conversation_id=eq.'+chatAtStart
-  },()=>{
-   if(currentChat===chatAtStart)loadMessages();
-  })
-  .on('postgres_changes',{
-   event:'*',
-   schema:'public',
-   table:'message_reactions'
-  },()=>{
-   if(currentChat===chatAtStart)loadMessages();
-  })
+  .on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'conversation_id=eq.'+chatAtStart},
+   ()=>{if(currentChat===chatAtStart)loadMessages()})
+  .on('postgres_changes',{event:'*',schema:'public',table:'message_reactions'},
+   ()=>{if(currentChat===chatAtStart)loadMessages()})
   .subscribe();
-
  if(typingChannel)db.removeChannel(typingChannel);
-
  typingChannel=db.channel('typing-'+chatAtStart)
   .on('broadcast',{event:'typing'},({payload})=>{
    if(payload?.user_id===user.id)return;
-
    $('typingStatus').textContent=payload?.typing?'Typing…':'';
-
    clearTimeout(typingClearTimer);
-
-   if(payload?.typing){
-    typingClearTimer=setTimeout(()=>{
-     $('typingStatus').textContent='';
-    },2500);
-   }
+   if(payload?.typing)typingClearTimer=setTimeout(()=>$('typingStatus').textContent='',2500);
   }).subscribe();
 }
-
 function emitTyping(value){
- if(typingChannel){
-  typingChannel.send({
-   type:'broadcast',
-   event:'typing',
-   payload:{user_id:user.id,typing:value}
-  });
- }
+ if(typingChannel)typingChannel.send({type:'broadcast',event:'typing',payload:{user_id:user.id,typing:value}});
 }
-
 $('messageInput').oninput=()=>{
- emitTyping(true);
- clearTimeout(typingStopTimer);
+ emitTyping(true);clearTimeout(typingStopTimer);
  typingStopTimer=setTimeout(()=>emitTyping(false),1100);
 };
-
 $('messageInput').onblur=()=>{
- clearTimeout(typingStopTimer);
- emitTyping(false);
+ clearTimeout(typingStopTimer);emitTyping(false);
 };
-
 $('composeForm').onsubmit=async e=>{
  e.preventDefault();
-
  const content=$('messageInput').value.trim();
  if(!content||!currentChat)return;
-
- const sendButton=$('composeForm').querySelector('.send-btn');
- setBusy(sendButton,true,'…');
-
- emitTyping(false);
- clearTimeout(typingStopTimer);
-
+ const b=$('composeForm').querySelector('.send-btn');setBusy(b,true,'…');
+ emitTyping(false);clearTimeout(typingStopTimer);
  try{
   const {error}=await db.from('messages').insert({
-   conversation_id:currentChat,
-   sender_id:user.id,
-   content
+   conversation_id:currentChat,sender_id:user.id,content
   });
-
   if(error)throw error;
-
-  $('messageInput').value='';
-  await loadMessages();
-
- }catch(error){
-  toast(error.message||'Message could not be sent');
- }finally{
-  setBusy(sendButton,false);
- }
+  $('messageInput').value='';await loadMessages();
+ }catch(err){toast(err.message||'Message could not be sent')}
+ finally{setBusy(b,false)}
 };
 
-/* CHAT PHOTO UPLOAD */
-
 $('photoInput').onchange=async()=>{
- const file=$('photoInput').files[0];
- if(!file||!currentChat)return;
-
- if(file.size>5*1024*1024){
-  $('photoInput').value='';
-  return toast('Photo must be under 5 MB');
- }
-
- if(!/^image\/(jpeg|png|webp|gif)$/.test(file.type)){
-  $('photoInput').value='';
-  return toast('Choose JPG, PNG, WEBP or GIF');
- }
-
+ const file=$('photoInput').files[0];if(!file||!currentChat)return;
+ if(file.size>5*1024*1024){$('photoInput').value='';return toast('Photo must be under 5 MB')}
+ if(!/^image\/(jpeg|png|webp|gif)$/.test(file.type)){$('photoInput').value='';return toast('Choose JPG, PNG, WEBP or GIF')}
  const chatAtStart=currentChat;
  const ext=file.name.split('.').pop().toLowerCase();
  const path=`${chatAtStart}/${user.id}/${crypto.randomUUID()}.${ext}`;
-
  try{
-  const {error:up}=await db.storage.from('chat-photos').upload(path,file,{
-   contentType:file.type
-  });
-
+  const {error:up}=await db.storage.from('chat-photos').upload(path,file,{contentType:file.type});
   if(up)throw up;
-
-  const {error}=await db.from('messages').insert({
-   conversation_id:chatAtStart,
-   sender_id:user.id,
-   image_url:path,
-   content:''
-  });
-
+  const {error}=await db.from('messages').insert({conversation_id:chatAtStart,sender_id:user.id,image_url:path,content:''});
   if(error)throw error;
-
   if(currentChat===chatAtStart)await loadMessages();
   toast('Photo sent');
-
- }catch(error){
-  console.error('Photo upload:',error);
-  toast(error.message||'Photo upload failed');
- }finally{
-  $('photoInput').value='';
- }
+ }catch(err){console.error(err);toast(err.message||'Photo upload failed')}
+ finally{$('photoInput').value=''}
 };
 
-/* HIDE CHAT */
-
-$('deleteChatBtn').onclick=()=>openModal(
- 'Hide this chat',
- '<p class="hint">This removes the conversation from your chat list only. The other person will still have the conversation and messages. You can reopen it by searching for the friend.</p>',
+$('deleteChatBtn').onclick=()=>openModal('Hide this chat',
+ '<p class="muted">This hides the chat only from your list. The other person keeps their messages. You can reopen it by searching for the friend.</p>',
  async()=>{
-  const chatToHide=currentChat;
-
-  const {error}=await db.rpc('hide_conversation_for_me',{
-   p_conversation_id:chatToHide
-  });
-
+  const chat=currentChat;
+  const {error}=await db.rpc('hide_conversation_for_me',{p_conversation_id:chat});
   if(error)throw error;
-
   if(channel)db.removeChannel(channel);
   if(typingChannel)db.removeChannel(typingChannel);
-
-  channel=null;
-  typingChannel=null;
-  currentChat=null;
-  peer=null;
-
-  $('chatArea').classList.add('hidden');
-  $('emptyState').classList.remove('hidden');
+  channel=null;typingChannel=null;currentChat=null;peer=null;
+  $('chatArea').classList.add('hidden');$('emptyState').classList.remove('hidden');
   $('app').classList.remove('chat-open');
-
-  await loadPeople();
-  toast('Chat hidden from your list');
- }
-);
-
+  await loadPeople();toast('Chat hidden');
+ });
 $('backBtn').onclick=()=>$('app').classList.remove('chat-open');
 
-/* PROFILE EDIT */
-
-$('editProfile').onclick=()=>openModal(
- 'Edit profile',
- `<label class="hint">Display name</label>
- <input id="newDisplay" class="field" maxlength="40" value="${esc(profile.display_name||'')}">
-
- <label class="hint">Username</label>
- <input id="newUsername" class="field" maxlength="24" value="${esc(profile.username)}">
-
- <label class="hint">New email (optional)</label>
- <input id="newEmail" class="field" type="email" placeholder="New email address">
-
- <label class="hint">Current password</label>
- <input id="currentPass" class="field" type="password" placeholder="Current password">
-
- <label class="hint">New password</label>
- <input id="newPass" class="field" type="password" placeholder="At least 8 characters">
-
+$('editProfile').onclick=()=>openModal('Edit profile',`
+ <label class="muted">Display name</label><input id="newDisplay" class="field" maxlength="40" value="${esc(profile.display_name||'')}">
+ <label class="muted">Username</label><input id="newUsername" class="field" maxlength="24" value="${esc(profile.username)}">
+ <label class="muted">New email (optional)</label><input id="newEmail" class="field" type="email" placeholder="New email address">
+ <label class="muted">Current password</label><input id="currentPass" class="field" type="password" placeholder="Current password">
+ <label class="muted">New password</label><input id="newPass" class="field" type="password" placeholder="At least 8 characters">
  <input id="confirmPass" class="field" type="password" placeholder="Confirm new password">`,
  async()=>{
   const display_name=$('newDisplay').value.trim();
@@ -1194,274 +895,118 @@ $('editProfile').onclick=()=>openModal(
   const current_password=$('currentPass').value;
   const new_password=$('newPass').value;
   const confirm_password=$('confirmPass').value;
-
-  if(!/^[a-z0-9_]{3,24}$/.test(username)){
-   throw Error('Username must be 3–24 letters, numbers or underscores');
-  }
-
-  if(new_password&&(new_password.length<8||new_password!==confirm_password)){
-   throw Error('Check the new password and confirmation');
-  }
-
-  const {error:pe}=await db.from('profiles')
-   .update({display_name,username})
-   .eq('id',user.id);
-
+  if(!/^[a-z0-9_]{3,24}$/.test(username))throw Error('Username must be 3–24 letters, numbers or underscores');
+  if(new_password&&(new_password.length<8||new_password!==confirm_password))throw Error('Check the new password and confirmation');
+  const {error:pe}=await db.from('profiles').update({display_name,username}).eq('id',user.id);
   if(pe)throw pe;
-
   if(email||new_password){
    if(!current_password)throw Error('Enter your current password');
-
-   const {error}=await db.functions.invoke('account-update',{
-    body:{
-     current_password,
-     new_email:email||null,
-     new_password:new_password||null
-    }
-   });
-
+   const {error}=await db.functions.invoke('account-update',{body:{
+    current_password,new_email:email||null,new_password:new_password||null
+   }});
    if(error)throw error;
   }
-
-  await loadProfile();
-  await loadPeople();
-  toast('Profile updated');
- }
-);
-
-/* PROFILE PHOTO */
+  await loadProfile();await loadPeople();toast('Profile updated');
+ });
 
 $('profilePhotoBtn').onclick=()=>{
- const f=document.createElement('input');
- f.type='file';
- f.accept='image/jpeg,image/png,image/webp';
-
+ const f=document.createElement('input');f.type='file';f.accept='image/jpeg,image/png,image/webp';
  f.onchange=async()=>{
-  const file=f.files[0];
-  if(!file)return;
-
+  const file=f.files[0];if(!file)return;
   if(file.size>5*1024*1024)return toast('Image must be under 5 MB');
-
-  if(!/^image\/(jpeg|png|webp)$/.test(file.type)){
-   return toast('Choose JPG, PNG or WEBP');
-  }
-
+  if(!/^image\/(jpeg|png|webp)$/.test(file.type))return toast('Choose JPG, PNG or WEBP');
   const ext=file.name.split('.').pop().toLowerCase();
   const path=`avatars/${user.id}/${crypto.randomUUID()}.${ext}`;
-
   try{
-   const {error}=await db.storage.from('chat-photos').upload(path,file,{
-    upsert:true,
-    contentType:file.type
-   });
-
+   const {error}=await db.storage.from('chat-photos').upload(path,file,{upsert:true,contentType:file.type});
    if(error)throw error;
-
-   const {error:pe}=await db.from('profiles')
-    .update({avatar_url:path})
-    .eq('id',user.id);
-
+   const {error:pe}=await db.from('profiles').update({avatar_url:path}).eq('id',user.id);
    if(pe)throw pe;
-
-   await loadProfile();
-   await loadPeople();
-
-   toast('Profile photo updated');
-
-  }catch(error){
-   console.error('Avatar upload:',error);
-   toast(error.message||'Profile photo upload failed');
-  }
+   await loadProfile();await loadPeople();toast('Profile photo updated');
+  }catch(err){toast(err.message||'Photo upload failed')}
  };
-
  f.click();
 };
 
-/* LOGOUT */
-
 $('logoutBtn').onclick=async()=>{
  try{
-  if(user){
-   await db.from('profiles')
-    .update({last_seen_at:new Date().toISOString()})
-    .eq('id',user.id);
-  }
-
-  if(presenceChannel){
-   await presenceChannel.untrack();
-   await db.removeChannel(presenceChannel);
-  }
-
+  if(user)await db.from('profiles').update({last_seen_at:new Date().toISOString()}).eq('id',user.id);
+  if(presenceChannel){await presenceChannel.untrack();await db.removeChannel(presenceChannel)}
   if(channel)await db.removeChannel(channel);
   if(typingChannel)await db.removeChannel(typingChannel);
-
   await db.auth.signOut();
-
- }catch(error){
-  toast(error.message||'Logout failed');
- }
+ }catch(e){toast(e.message||'Logout failed')}
 };
 
-/* PRESENCE */
-
 function onlineUserIds(){
- const state=presenceChannel?.presenceState?.()||{};
- const ids=new Set();
-
- Object.entries(state).forEach(([key,metas])=>
-  (metas||[]).forEach(meta=>ids.add(meta.user_id||key))
- );
-
+ const state=presenceChannel?.presenceState?.()||{},ids=new Set();
+ Object.entries(state).forEach(([key,metas])=>(metas||[]).forEach(m=>ids.add(m.user_id||key)));
  return ids;
 }
-
 function relativeSeen(value){
  if(!value)return 'Last seen recently';
-
- const secs=Math.max(0,Math.floor((Date.now()-new Date(value).getTime())/1000));
-
- if(secs<60)return 'Seen now';
- if(secs<3600)return `Seen ${Math.floor(secs/60)}m ago`;
- if(secs<86400)return `Seen ${Math.floor(secs/3600)}h ago`;
-
- return `Seen ${Math.floor(secs/86400)}d ago`;
+ const s=Math.max(0,Math.floor((Date.now()-new Date(value).getTime())/1000));
+ if(s<60)return 'Seen now';if(s<3600)return `Seen ${Math.floor(s/60)}m ago`;
+ if(s<86400)return `Seen ${Math.floor(s/3600)}h ago`;
+ return `Seen ${Math.floor(s/86400)}d ago`;
 }
-
 function refreshPresenceLabels(){
  const online=onlineUserIds();
-
  document.querySelectorAll('[data-person-status]').forEach(el=>{
   const p=(window.__onlyUsPeople||[]).find(x=>x.id===el.dataset.personStatus);
-
-  el.textContent=online.has(el.dataset.personStatus)
-   ?'Online'
-   :relativeSeen(p?.last_seen_at);
+  el.textContent=online.has(el.dataset.personStatus)?'Online':relativeSeen(p?.last_seen_at);
  });
-
- if(peer){
-  $('peerStatus').textContent=online.has(peer.id)
-   ?'Online'
-   :relativeSeen(peer.last_seen_at);
- }
+ if(peer)$('peerStatus').textContent=online.has(peer.id)?'Online':relativeSeen(peer.last_seen_at);
 }
-
 async function startPresence(){
- if(presenceChannel){
-  await db.removeChannel(presenceChannel);
- }
-
- presenceChannel=db.channel('presence-global',{
-  config:{presence:{key:user.id}}
- });
-
- presenceChannel
-  .on('presence',{event:'sync'},refreshPresenceLabels)
+ if(presenceChannel)await db.removeChannel(presenceChannel);
+ presenceChannel=db.channel('presence-global',{config:{presence:{key:user.id}}});
+ presenceChannel.on('presence',{event:'sync'},refreshPresenceLabels)
   .on('presence',{event:'join'},refreshPresenceLabels)
   .on('presence',{event:'leave'},refreshPresenceLabels);
-
  presenceChannel.subscribe(async status=>{
   if(status==='SUBSCRIBED'){
-   await presenceChannel.track({
-    user_id:user.id,
-    online_at:new Date().toISOString()
-   });
-
+   await presenceChannel.track({user_id:user.id,online_at:new Date().toISOString()});
    refreshPresenceLabels();
   }
  });
-
  if(statusRefreshTimer)clearInterval(statusRefreshTimer);
-
  statusRefreshTimer=setInterval(()=>{
-  refreshPresenceLabels();
-  if(currentChat)loadMessages();
+  refreshPresenceLabels();if(currentChat)loadMessages();
  },15000);
-
- if(!presenceListenerAdded){
-  presenceListenerAdded=true;
-
-  document.addEventListener('visibilitychange',async()=>{
-   if(!user)return;
-
-   if(document.visibilityState==='hidden'){
-    await db.from('profiles')
-     .update({last_seen_at:new Date().toISOString()})
-     .eq('id',user.id);
-
-    if(presenceChannel)await presenceChannel.untrack();
-
-   }else if(presenceChannel){
-    await presenceChannel.track({
-     user_id:user.id,
-     online_at:new Date().toISOString()
-    });
-
-    await db.from('profiles')
-     .update({last_seen_at:new Date().toISOString()})
-     .eq('id',user.id);
-   }
-  });
- }
 }
-
-/* AUTH STATE CHANGES */
 
 db.auth.onAuthStateChange((event,session)=>{
  if(event==='SIGNED_IN'||event==='INITIAL_SESSION'){
-  setTimeout(()=>{
-   if(session?.user)startApp();
-  },0);
+  setTimeout(()=>{if(session?.user)startApp()},0);
  }
-
  if(event==='SIGNED_OUT'){
   setTimeout(()=>{
-   user=null;
-   profile=null;
-   currentChat=null;
-   peer=null;
-
+   user=null;profile=null;currentChat=null;peer=null;
    if(channel)db.removeChannel(channel);
    if(typingChannel)db.removeChannel(typingChannel);
    if(presenceChannel)db.removeChannel(presenceChannel);
-
-   channel=null;
-   typingChannel=null;
-   presenceChannel=null;
-
+   channel=null;typingChannel=null;presenceChannel=null;
    if(statusRefreshTimer)clearInterval(statusRefreshTimer);
-
-   $('app').classList.add('hidden');
-   $('app').classList.remove('chat-open');
+   $('app').classList.add('hidden');$('app').classList.remove('chat-open');
    $('authView').classList.remove('hidden');
   },0);
  }
-
  if(event==='PASSWORD_RECOVERY'){
-  setTimeout(()=>{
-   openModal(
-    'Set a new password',
-    '<input id="resetPass" class="field" type="password" placeholder="New password"><input id="resetPass2" class="field" type="password" placeholder="Confirm new password">',
-    async()=>{
-     const a=$('resetPass').value;
-     const b=$('resetPass2').value;
-
-     if(a.length<8||a!==b){
-      throw Error('Passwords must match and be at least 8 characters');
-     }
-
-     const {error}=await db.auth.updateUser({password:a});
-     if(error)throw error;
-
-     toast('Password updated');
-    }
-   );
-  },0);
+  setTimeout(()=>openModal('Set a new password',
+   '<input id="resetPass" class="field" type="password" placeholder="New password"><input id="resetPass2" class="field" type="password" placeholder="Confirm new password">',
+   async()=>{
+    const a=$('resetPass').value,b=$('resetPass2').value;
+    if(a.length<8||a!==b)throw Error('Passwords must match and be at least 8 characters');
+    const {error}=await db.auth.updateUser({password:a});
+    if(error)throw error;toast('Password updated');
+   }),0);
  }
 });
-
-/* INITIAL SESSION CHECK */
 
 startApp();
 
 })();
 </script>
+</body>
+</html>
