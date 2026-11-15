@@ -36,7 +36,7 @@ const URL='https://vdmnhlwemcwdmwjfggzn.supabase.co',KEY='sb_publishable_S19oIIH
 const say=s=>{$('toast').textContent=s;$('toast').classList.remove('hidden');clearTimeout(say.t);say.t=setTimeout(()=>$('toast').classList.add('hidden'),3500)};
 if(!window.supabase?.createClient){$('authNote').textContent='Supabase library did not load. Check internet and refresh.';return}
 const db=window.supabase.createClient(URL,KEY);
-let user=null,profile=null,signup=false,chatId=null,friend=null,modalSave=null,channel=null,searchTimer=null,typingTimer=null,presenceTimer=null,lastTypingSent=0;
+let user=null,profile=null,signup=false,chatId=null,friend=null,modalSave=null,channel=null,searchTimer=null,typingTimer=null,presenceTimer=null,lastTypingSent=0,refreshTimer=null;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const initials=p=>(p?.display_name||p?.username||'?').slice(0,1).toUpperCase();
 async function asset(path){if(!path)return '';if(/^https?:/i.test(path))return path;const {data,error}=await db.storage.from('chat-photos').createSignedUrl(path,3600);return error?'':data?.signedUrl||''}
