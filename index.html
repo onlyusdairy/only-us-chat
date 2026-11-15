@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +7,11 @@
 <title>Only Us — Private Chat</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+if (!window.supabase) {
+  document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
+}
+</script>
 
 <style>
 :root{
@@ -395,9 +399,7 @@ function authMode(signup){
  $('forgotBtn').classList.toggle('hidden',signup);
  $('authMessage').textContent='';
 }
-$('authSwitch').onclick=()=>authMode(!isSignup);
-
-$('authMain').onclick=async()=>{
+$('authSwitch').onclick=()=>authMode(!isSignup);$('authMain').onclick=async()=>{
  const email=$('authEmail').value.trim();
  const password=$('authPassword').value;
  const username=$('authUsername').value.trim().toLowerCase();
@@ -697,8 +699,7 @@ function showMessageMenu(id,deleted,x,y){
   const react=e.target.closest('[data-pick-emoji]');
   const action=e.target.closest('[data-menu-action]');
   if(!react&&!action)return;
-  try{
-   if(react){await toggleReaction(id,react.dataset.pickEmoji);closeMessageMenu();return}
+  try{   if(react){await toggleReaction(id,react.dataset.pickEmoji);closeMessageMenu();return}
    if(action.dataset.menuAction==='delete-me'){
     const {error}=await db.rpc('hide_message_for_me',{p_message_id:id});
     if(error)throw error;
